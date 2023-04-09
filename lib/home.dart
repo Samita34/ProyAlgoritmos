@@ -298,6 +298,7 @@ class _MyhomeState extends State<Myhome> {
           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             FloatingActionButton(
               mini: true,
+              heroTag: 'matriz',
               onPressed: () {
                 List<List<String>> matrizAdyacencia = [];
                 Navigator.of(context).push(MaterialPageRoute(
@@ -315,6 +316,7 @@ class _MyhomeState extends State<Myhome> {
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
+              heroTag: 'help',
               onPressed: () {
                 showDialog(
                     context: context,
@@ -350,6 +352,7 @@ class _MyhomeState extends State<Myhome> {
           Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
          FloatingActionButton(
   mini: true,
+  heroTag: 'Asignacion',
   onPressed: () {
     List<int> asignacionOptima = calcularAsignacionOptima();
     showDialog(
