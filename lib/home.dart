@@ -52,6 +52,22 @@ class _MyhomeState extends State<Myhome> {
   //Lista auxiliar para remover lineas
   List<ModeloLinea> vLineasRemove = [];
 
+  List<modelo> modeloGuardado=[];
+
+  int cantN=0,cantL=0;
+
+  TextEditingController tituloGuardado=TextEditingController();
+  
+  TextEditingController descripcionGuardada=TextEditingController();
+
+  late int ID;
+  
+  @override
+  void initState() {
+    cargaModelo();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //Aplicación
