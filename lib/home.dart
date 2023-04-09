@@ -436,9 +436,25 @@ class _MyhomeState extends State<Myhome> {
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.save),
-                    label: "Guardar",
+                    label: "Sobresescribir",
                     onTap: () => setState(() {
                           modo = 6;
+                          setState(() {
+                            cantN=0;
+                            cantL=0;
+                            String cifraNodo=cifradoNodos();
+                            String cifraLinea=cifradoLineas();
+                            _Sobrescribir(context,cifraNodo,cifraLinea);
+                            setState(() {
+
+                          });
+                  });
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.save),
+                    label: "Guardar como",
+                    onTap: () => setState(() {
+                          modo = 7;
                           setState(() {
                             cantN=0;
                             cantL=0;
@@ -454,7 +470,7 @@ class _MyhomeState extends State<Myhome> {
                     child: Icon(Icons.drive_folder_upload),
                     label: "Cargar",
                     onTap: () => setState(() {
-                          modo = 7;
+                          modo = 8;
                           setState(() {
                             _MensajeCargar(context);
                             setState(() {
@@ -893,9 +909,110 @@ _MensajeGuardado(context,String cifraNodo,String cifraLinea)
                       DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
                       cargaModelo();
                       setState(() {
-
                       });
 
+                    });
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Text("OK")
+              ),
+              //cancela el cambio
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel")
+              ),
+            ],
+          );
+        });
+  }
+  _Sobrescribir(context,String cifraNodo,String cifraLinea)
+  {
+    showDialog(
+        context: context,
+        //El mensaje no se puede saltear
+        builder: (context){
+          return AlertDialog(
+            //titulo del mensaje
+            title: Text("GRAFO A SOBRESCRIBIR"),
+            content:Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Seleccione:'),
+                Container(
+                  color: Colors.blue,
+                  height: 300,
+                  width: 250,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: modeloGuardado.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            title: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('${modeloGuardado[index].id}'),
+                                VerticalDivider(
+
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Text('${modeloGuardado[index].Nombre}',overflow: TextOverflow.ellipsis,),
+                                      scrollDirection: Axis.horizontal,
+                                    ),
+                                    Text('Lineas: ${modeloGuardado[index].cantidadLineas}'),
+                                    Text('Nodos: ${modeloGuardado[index].cantidadNodos}'),
+                                    Text('Descripción:'),
+                                    Container(
+                                      height: 56,
+                                      width: 150,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Text('${modeloGuardado[index].Descripcion}'),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            onTap: () {
+                              setState(() {
+                                DB.delete(modeloGuardado[index]);
+                                cargaModelo();
+                                Navigator.of(context).pop();
+                                ID=index+1;
+                                DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
+                                cargaModelo();
+                              });
+                            },
+                          ),
+
+                        );
+                      },
+
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              //Confirma el guardado
+              TextButton(
+                  onPressed: (){
+                    setState(() {
                     });
                     Navigator.of(context).pop();
 
