@@ -388,7 +388,7 @@ class _MyhomeState extends State<Myhome> {
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.line_axis),
+                    child: Icon(Icons.timeline),
                     label: "Crear relacion",
                     onTap: () => setState(() {
                           modo = 2;
@@ -402,7 +402,7 @@ class _MyhomeState extends State<Myhome> {
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.check_circle),
+                    child: Icon(Icons.pan_tool),
                     label: "Mover Nodo",
                     onTap: () => setState(() {
                           modo = 4;
@@ -416,6 +416,34 @@ class _MyhomeState extends State<Myhome> {
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
+                    child: Icon(Icons.save),
+                    label: "Guardar",
+                    onTap: () => setState(() {
+                          modo = 6;
+                          setState(() {
+                            cantN=0;
+                            cantL=0;
+                            String cifraNodo=cifradoNodos();
+                            String cifraLinea=cifradoLineas();
+                            _MensajeGuardado(context,cifraNodo,cifraLinea);
+                            setState(() {
+
+                          });
+                  });
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.drive_folder_upload),
+                    label: "Cargar",
+                    onTap: () => setState(() {
+                          modo = 7;
+                          setState(() {
+                            _MensajeCargar(context);
+                            setState(() {
+
+                          });
+                  });
+                        })),
+                SpeedDialChild(
                     child: Icon(Icons.clear),
                     label: "Borrar Todo",
                     onTap: () => setState(() {
@@ -427,8 +455,6 @@ class _MyhomeState extends State<Myhome> {
                             eliminarBoceto();
                           });
                         })),
-                
-            
               ],
             ),
           ]),
@@ -802,7 +828,306 @@ class _MyhomeState extends State<Myhome> {
           );
         });
   }
+_MensajeGuardado(context,String cifraNodo,String cifraLinea)
+  {
+    showDialog(
+        context: context,
+        //El mensaje no se puede saltear
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            //titulo del mensaje
+            title: Text("GUARDADO DE GRAFO"),
+            content:Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  //valor numerico almacenado en receptorMensaje
+                  controller: tituloGuardado,
+                  decoration: InputDecoration(
+                      hintText: 'Introduzca un Nombre',
+                  ),
+                ),
+                TextField(
+                  controller: descripcionGuardada,
+                  decoration: InputDecoration(
+                    hintText: 'Introduzca una descripción'
+                  ),
+                ),
+                Text('Cantidad de Nodos: ${cantN}'),
+                Text('Cantidad de Conexiones: ${cantL}')
+              ],
+            ),
+            actions: [
+              //Confirma el guardado
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                      if(modeloGuardado.isEmpty)
+                      {
+                        ID=0;
+                      }
+                      else
+                      {
+                        ID=modeloGuardado[modeloGuardado.length-1].id+1;
+                      }
+                      DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
+                      cargaModelo();
+                      setState(() {
 
+                      });
+
+                    });
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Text("OK")
+              ),
+              //cancela el cambio
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel")
+              ),
+            ],
+          );
+        });
+  }
+  _MensajeCargar(context)
+  {
+    showDialog(
+        context: context,
+        //El mensaje no se puede saltear
+        builder: (context){
+          return AlertDialog(
+            //titulo del mensaje
+            title: Text("CARGADO DE GRAFO"),
+            content:Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Seleccione la configuración:'),
+                Container(
+                  color: Colors.blue,
+                  height: 300,
+                  width: 250,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: modeloGuardado.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            title: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('${modeloGuardado[index].id}'),
+                                VerticalDivider(
+
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Text('${modeloGuardado[index].Nombre}',overflow: TextOverflow.ellipsis,),
+                                      scrollDirection: Axis.horizontal,
+                                    ),
+                                    Text('Lineas: ${modeloGuardado[index].cantidadLineas}'),
+                                    Text('Nodos: ${modeloGuardado[index].cantidadNodos}'),
+                                    Text('Descripción:'),
+                                    Container(
+                                      height: 56,
+                                      width: 150,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Text('${modeloGuardado[index].Descripcion}'),
+                                      ),
+
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            onTap: () {
+                             setState(() {
+                               Navigator.of(context).pop();
+                               _confirmarCargado(context, index);
+                             });
+                            },
+                            onLongPress: () {
+                              setState(() {
+                                Navigator.of(context).pop();
+                                _confirmarEliminacion(context, index);
+                              });
+                            },
+                          ),
+
+                        );
+                      },
+
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              //Confirma el guardado
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Text("OK")
+              ),
+              //cancela el cambio
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel")
+              ),
+            ],
+          );
+        });
+  }
+  Future cargaModelo() async{
+    List<modelo> auxModelo= await DB.cargarLista();
+    setState(() {
+      modeloGuardado=auxModelo;
+    });
+  }
+  _confirmarEliminacion(context,int index)
+  {
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            //Titulo del mensaje
+            title: Text("SEGURO QUE QUIERE ELIMINAR EL GRAFO?"),
+            actions: [
+              //Confirma la unión de nodos
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                      DB.delete(modeloGuardado[index]);
+                      cargaModelo();
+                      Navigator.of(context).pop();
+
+                    });
+                  },
+                  //texto del boton
+                  child: Text("OK")
+              ),
+              //cancela la unión de nodos
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
+                  child: Text("Cancel")
+              ),
+            ],
+          );
+        });
+  }
+  _confirmarCargado(context,int index)
+  {
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        barrierDismissible: false,
+        builder: (context){
+          return AlertDialog(
+            //Titulo del mensaje
+            title: Text("SEGURO QUE QUIERE CARGAR EL GRAFO?"),
+            actions: [
+              //Confirma la unión de nodos
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                      descrifrado(modeloGuardado[index]);
+                      Navigator.of(context).pop();
+                    });
+                  },
+                  //texto del boton
+                  child: Text("OK")
+              ),
+              //cancela la unión de nodos
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
+                  child: Text("Cancel")
+              ),
+            ],
+          );
+        });
+  }
+  String cifradoNodos(){
+    String cifrado="";
+    vNodo.forEach((Nodo) {
+      cantN++;
+      cifrado=cifrado+Nodo.x.toStringAsPrecision(7)+","+Nodo.y.toStringAsPrecision(7)+","+Nodo.radio.toString()+","+Nodo.codigo+","+Nodo.st.toString()+";";
+    });
+    return cifrado;
+  }
+  String cifradoLineas(){
+    String cifrado="";
+    vLineas.forEach((Linea) {
+      cantL++;
+      cifrado=cifrado+Linea.Ni.codigo+","+Linea.Nf.codigo+","+Linea.valor+","+Linea.tipo.toString()+";";
+    });
+    return cifrado;
+  }
+
+  void descrifrado(modelo cifrado){
+    vNodo.clear();
+    List<String> ListaNodos = cifrado.Nodos.split(";");
+    for(int i=0;i<cifrado.cantidadNodos;i++)
+    {
+      List<String> Nodo=ListaNodos[i].split(",");
+      vNodo.add(ModeloNodo(double.parse(Nodo[0]), double.parse(Nodo[1]), double.parse(Nodo[2]),Nodo[3],Nodo[3],false));
+    }
+    vLineas.clear();
+    List<String> ListaLineas=cifrado.Lineas.split(";");
+    print(ListaLineas);
+    for(int i=0;i<cifrado.cantidadLineas;i++)
+    {
+      ModeloNodo Nii=vNodo[0];
+      ModeloNodo Nff=vNodo[0];
+      List<String> Linea=ListaLineas[i].split(',');
+      vNodo.forEach((Nodo) {
+        if(Nodo.codigo==Linea[0])
+        {
+          Nii=Nodo;
+        }
+        if(Nodo.codigo==Linea[1])
+        {
+          Nff=Nodo;
+        }
+      });
+      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
+    }
+
+  }
 //  void _abrirDartHelp(BuildContext context) {
 //    Navigator.push(
 //      context,
