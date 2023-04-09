@@ -4,6 +4,7 @@ import 'modelos.dart';
 import 'figura.dart';
 //import 'help.dart';
 import 'matriz.dart';
+import 'hungarian_algorithm.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -147,9 +148,10 @@ class _MyhomeState extends State<Myhome> {
                         receptorMensaje.clear();
                         //Muestra una alerta para pedir el nuevo número que será asignado a la conexión
                         _showDialogCambio(context, e, lineaAux);
-                      } else if (verificaConexion(e) == 1) {
-                        vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1));
-                      } else {
+                      } //else if (verificaConexion(e) == 1) {
+                        //vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1));
+                        //}
+                       else {
                         _showDialog(context, e);
                       }
                     }
@@ -329,6 +331,49 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+         FloatingActionButton(
+  mini: true,
+  onPressed: () {
+    List<int> asignacionOptima = calcularAsignacionOptima();
+    showDialog(
+      context: context,
+      //El mensaje no se puede saltear
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          //titulo del mensaje
+          title: Text("Asignación óptima"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: asignacionOptima
+                .asMap()
+                .entries
+                .map((entry) => Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                .toList(),
+          ),
+          actions: [
+            //Botón del mensaje de cancelar eliminación
+            TextButton(
+                onPressed: () {
+                  //sale del mensaje
+                  Navigator.of(context).pop();
+                },
+                //Mensaje del botón
+                child: Text("Aceptar")),
+          ],
+        );
+      },
+    );
+  },
+  child: const Icon(
+    Icons.linear_scale, // Cambio del icono a linear_scale
+    size: 40,
+  ),
+),
+
+
             Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
@@ -382,6 +427,8 @@ class _MyhomeState extends State<Myhome> {
                             eliminarBoceto();
                           });
                         })),
+                
+            
               ],
             ),
           ]),
@@ -425,6 +472,22 @@ class _MyhomeState extends State<Myhome> {
     });
     return matrizAdyacencia;
   }
+  List<int> calcularAsignacionOptima() {
+    List<List<String>> matrizAdyacencia = [];
+
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+
+    List<List<int>> matrizAdyacenciaInt = matrizAdyacencia
+        .skip(1)
+        .map((fila) => fila.skip(1).map((element) => int.parse(element)).toList())
+        .toList();
+
+    List<int> asignacion = hungarianAlgorithm(matrizAdyacenciaInt);
+    List<int> asignacionOptima = List.generate(asignacion.length, (i) => asignacion[i] + 1);
+
+    return asignacionOptima;
+  }
+
 
 //Función eliminar lineas, llamada por la función _showDialogEliminar
   void eliminarLineas(ModeloNodo e) {
