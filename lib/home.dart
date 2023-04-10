@@ -407,25 +407,17 @@ class _MyhomeState extends State<Myhome> {
               onPressed: () {
                 of = [];
                 dem = [];
-                int a = 0;
+
                 List<List<String>> matrizAdyacencia = [];
 
                 matrizAdyacencia = generaMatriz(matrizAdyacencia);
-                for (int i = 0; i < matrizAdyacencia.length; i++) {
-                  _showDialogDem(context, i + 1);
-                }
 
-                for (int i = 0; i < matrizAdyacencia.length; i++) {
-                  _showDialogOf(context, i + 1);
-                }
+                _showDialogOf(context, 1);
+                _showDialogDem(context, 1);
 
-                Norwest nor = Norwest();
-                var res = nor.calcNor(matrizAdyacencia, of, dem);
-                a = 1;
-                if (a == 1) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => matnor(res, matrizAdyacencia)));
-                }
+                //for (int i = 0; i < matrizAdyacencia.length; i++) {
+                //  _showDialogDem(context, i - 1);
+                //}
 
                 //print(jon.calcJon(matrizAdyacencia));
               },
@@ -637,108 +629,117 @@ class _MyhomeState extends State<Myhome> {
         });
   }
 
-  _showDialogDem(context, int con) {
+  _showDialogDem(BuildContext context, int con) {
     showDialog(
-        context: context,
-        //No puede ser salteado
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            //Titulo del mensaje
-            title: Text("Ingrese demanda " + con.toString()),
-
-            //TextField para recibir un valor
-            content: Form(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: Text("Ingrese oferta " + con.toString()),
+              content: Form(
                 child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  //Teclado solo tenga numeros
-                  keyboardType: TextInputType.number,
-                  //valor numerico almacenado en receptorMensaje
-                  controller: receptorMensaje,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      controller: receptorMensaje,
+                    ),
+                  ],
                 ),
-              ],
-            )),
-            actions: [
-              //Confirma la unión de nodos
-
-              TextButton(
+              ),
+              actions: [
+                TextButton(
                   onPressed: () {
-                    dem.add(receptorMensaje.text);
+                    con++;
                     setState(() {});
-                    //sale del mensaje
+                    List<List<String>> matrizAdyacencia = [];
+                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+
+                    if (con < matrizAdyacencia.length) {
+                      _showDialogDem(context, con);
+                    }
+                    dem.add(receptorMensaje.text);
+
                     receptorMensaje.clear();
                     Navigator.of(context).pop();
                   },
-                  //texto del boton
-                  child: Text("OK")),
-              //cancela la unión de nodos
-              TextButton(
+                  child: Text("OK"),
+                ),
+                TextButton(
                   onPressed: () {
-                    //Cambia el color del nodo inicial a azul
-
                     setState(() {});
-                    //sale del mensaje
                     Navigator.of(context).pop();
                   },
-                  //texto del boton
-                  child: Text("Cancel")),
-            ],
-          );
-        });
+                  child: Text("Cancel"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
-  _showDialogOf(context, int con) {
+  _showDialogOf(BuildContext context, int con) {
     showDialog(
-        context: context,
-        //No puede ser salteado
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            //Titulo del mensaje
-            title: Text("Ingrese oferta " + con.toString()),
-
-            //TextField para recibir un valor
-            content: Form(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setState) {
+            return AlertDialog(
+              title: Text("Ingrese demana " + con.toString()),
+              content: Form(
                 child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  //Teclado solo tenga numeros
-                  keyboardType: TextInputType.number,
-                  //valor numerico almacenado en receptorMensaje
-                  controller: receptorMensaje,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      controller: receptorMensaje,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    con++;
+                    setState(() {});
+                    List<List<String>> matrizAdyacencia = [];
+                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+
+                    if (con < matrizAdyacencia.length) {
+                      _showDialogOf(context, con);
+                    }
+                    of.add(receptorMensaje.text);
+                    if (con == matrizAdyacencia.length) {
+                      Norwest nor = Norwest();
+                      var res = nor.calcNor(matrizAdyacencia, of, dem);
+                      receptorMensaje.clear();
+                      Navigator.of(context).pop();
+                      // Navegar a la nueva página
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => matnor(res, matrizAdyacencia),
+                      ));
+                    }
+                  },
+                  child: Text("OK"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel"),
                 ),
               ],
-            )),
-            actions: [
-              //Confirma la unión de nodos
-
-              TextButton(
-                  onPressed: () {
-                    of.add(receptorMensaje.text);
-                    setState(() {});
-                    //sale del mensaje
-                    receptorMensaje.clear();
-                    Navigator.of(context).pop();
-                  },
-                  //texto del boton
-                  child: Text("OK")),
-              //cancela la unión de nodos
-              TextButton(
-                  onPressed: () {
-                    //Cambia el color del nodo inicial a azul
-
-                    setState(() {});
-                    //sale del mensaje
-                    Navigator.of(context).pop();
-                  },
-                  //texto del boton
-                  child: Text("Cancel")),
-            ],
-          );
-        });
+            );
+          },
+        );
+      },
+    );
   }
 
   //Mensaje de alerta para la Unir dos nodos
