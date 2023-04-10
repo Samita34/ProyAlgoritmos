@@ -443,7 +443,7 @@ class _MyhomeState extends State<Myhome> {
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.save),
-                    label: "Guardar",
+                    label: "Sobresescribir",
                     onTap: () => setState(() {
                           modo = 6;
                           setState(() {
@@ -459,7 +459,7 @@ class _MyhomeState extends State<Myhome> {
                     child: Icon(Icons.drive_folder_upload),
                     label: "Cargar",
                     onTap: () => setState(() {
-                          modo = 7;
+                          modo = 8;
                           setState(() {
                             _MensajeCargar(context);
                             setState(() {});
