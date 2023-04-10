@@ -1,83 +1,59 @@
 class Norwest {
-  //calcJon(List<List<String>> mat) {
-  calcNor() {
-    List<String> dem = ["300", "260", "440"];
-    List<String> of = ["240", "260", "500"];
-    //print(sums(dem));
-    //print(sums(of));
-
-    if (sums(dem) > sums(of)) {
-      of.add((sums(dem) - sums(of)).toString());
-    } else if (sums(dem) < sums(of)) {
-      dem.add((sums(of) - sums(dem)).toString());
-    }
-
-    List<List<String>> mat = [
-      ["20", "30", "36"],
-      ["2", "10", "6"],
-      ["14", "22", "18"]
-    ];
+  calcNor(List<List<String>> mat, List<String> of, List<String> dem) {
+    //calcNor() {
+    //List<String> dem = ["2", "6", "5", "1"];
+    //List<String> of = ["6", "5", "3"];
+    //List<List<String>> mat = [
+    //  ["", "a", "b", "c", "d"],
+    //  ["a", "3", "2", "8", "9"],
+    //  ["b", "7", "3", "2", "6"],
+    //  ["c", "7", "3", "3", "3"],
+    //  ["d", "0", "0", "0", "0"],
+    //];
     int n = mat.length;
-    int m = mat[0].length;
+
     int s = 0;
-    List<int> esq = [0, 0];
-    List<List<String>> aux = List.generate(n, (_) => List.filled(m, "inf"));
-
-    while (s < sums(dem)) {
-      print(dem);
-      int valof = int.parse(of[esq[0]]);
-      int valdem = int.parse(dem[esq[1]]);
+    List<int> esq = [1, 1];
+    List<List<String>> aux =
+        List.generate(n - 1, (_) => List.filled(n - 1, ""));
+    while (esq[0] < n && esq[1] < n) {
+      int valof = int.parse(of[esq[0] - 1]);
+      int valdem = int.parse(dem[esq[1] - 1]);
       if (valdem == valof) {
-        aux[esq[0]][esq[1]] = valof.toString();
-        s += valof;
-
+        aux[esq[0] - 1][esq[1] - 1] = valof.toString();
         valof = 0;
         valdem = 0;
-        of[esq[0]] = valof.toString();
-        dem[esq[1]] = valdem.toString();
-        esq[1] += 1;
-        esq[0] += 1;
+        of[esq[0] - 1] = valof.toString();
+        dem[esq[1] - 1] = valdem.toString();
+        esq[1]++;
+        esq[0]++;
       } else if (valof > valdem) {
-        aux[esq[0]][esq[1]] = valdem.toString();
-        s += valdem;
+        aux[esq[0] - 1][esq[1] - 1] = valdem.toString();
         valof = valof - valdem;
-        valdem = 0;
-        of[esq[0]] = valof.toString();
-        dem[esq[1]] = valdem.toString();
-        esq[1] += 1;
+        valdem = valdem - valdem;
+        of[esq[0] - 1] = valof.toString();
+        dem[esq[1] - 1] = valdem.toString();
+        esq[1]++;
       } else if (valof < valdem) {
-        aux[esq[0]][esq[1]] = valof.toString();
-        s += valof;
-        valof = valof - valof;
+        aux[esq[0] - 1][esq[1] - 1] = valof.toString();
+
         valdem = valdem - valof;
-        of[esq[0]] = valof.toString();
-        dem[esq[1]] = valdem.toString();
-        esq[0] += 1;
+        valof = valof - valof;
+
+        of[esq[0] - 1] = valof.toString();
+        dem[esq[1] - 1] = valdem.toString();
+        esq[0]++;
       }
-      //print(dem);
-      //print(of);
     }
-    //print(s);
-    //void vuelta(int pos, int sum, List<int> ruta) {
-    //  if (sum > sm) {
-    //    sm = sum;
-    //    rutaMasLarga = ruta.toList();
-    //  }
-    //  for (int i = 1; i < n; i++) {
-    //    if (mat[pos][i] != "0") {
-    //      List<int> nuevaRuta = ruta.toList()..add(i);
-    //      vuelta(i, sum + int.parse(mat[pos][i]), nuevaRuta);
-    //    }
-    //  }
-    //}
-//
-    //for (int i = 1; i < n; i++) {
-    //  vuelta(i, 0, [i]);
-    //}
-    //for (int i = 0; i < rutaMasLarga.length; i++) {
-    //  rutaNodos.add(mat[0][rutaMasLarga[i]]);
-    //}
-    //return [sm, rutaNodos];
+    for (int i = 1; i < n; i++) {
+      for (int j = 1; j < n; j++) {
+        if (!identical("", aux[i - 1][j - 1])) {
+          s += int.parse(aux[i - 1][j - 1]) * int.parse(mat[i][j]);
+        }
+      }
+    }
+    print(aux);
+    return aux;
   }
 
   int sums(List<String> vec) {

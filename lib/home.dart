@@ -9,6 +9,7 @@ import 'matriz.dart';
 import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
 import 'norwest.dart';
+import 'matnor.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -63,6 +64,8 @@ class _MyhomeState extends State<Myhome> {
   TextEditingController tituloGuardado = TextEditingController();
 
   TextEditingController descripcionGuardada = TextEditingController();
+  List<String> of = [];
+  List<String> dem = [];
 
   late int ID;
 
@@ -305,13 +308,10 @@ class _MyhomeState extends State<Myhome> {
               heroTag: "matriz",
               onPressed: () {
                 List<List<String>> matrizAdyacencia = [];
-                //Johnson jon = Johnson();
-                Norwest nor = Norwest();
+
                 matrizAdyacencia = generaMatriz(matrizAdyacencia);
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => matriz(matrizAdyacencia)));
-                nor.calcNor();
-                //print(jon.calcJon(matrizAdyacencia));
               },
               child: const Icon(
                 Icons.apps_outage,
@@ -398,6 +398,43 @@ class _MyhomeState extends State<Myhome> {
               child: const Icon(
                 Icons.linear_scale, // Cambio del icono a linear_scale
                 size: 40,
+              ),
+            ),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "norwest",
+              onPressed: () {
+                of = [];
+                dem = [];
+                int a = 0;
+                List<List<String>> matrizAdyacencia = [];
+
+                matrizAdyacencia = generaMatriz(matrizAdyacencia);
+                for (int i = 0; i < matrizAdyacencia.length; i++) {
+                  _showDialogDem(context, i + 1);
+                }
+
+                for (int i = 0; i < matrizAdyacencia.length; i++) {
+                  _showDialogOf(context, i + 1);
+                }
+
+                Norwest nor = Norwest();
+                var res = nor.calcNor(matrizAdyacencia, of, dem);
+                a = 1;
+                if (a == 1) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => matnor(res, matrizAdyacencia)));
+                }
+
+                //print(jon.calcJon(matrizAdyacencia));
+              },
+              child: const Icon(
+                Icons.apps_outage,
+                size: 40,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
               ),
             ),
             Expanded(child: Container()),
@@ -594,6 +631,110 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                   },
                   //Mensaje del botón
+                  child: Text("Cancel")),
+            ],
+          );
+        });
+  }
+
+  _showDialogDem(context, int con) {
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            //Titulo del mensaje
+            title: Text("Ingrese demanda " + con.toString()),
+
+            //TextField para recibir un valor
+            content: Form(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  //Teclado solo tenga numeros
+                  keyboardType: TextInputType.number,
+                  //valor numerico almacenado en receptorMensaje
+                  controller: receptorMensaje,
+                ),
+              ],
+            )),
+            actions: [
+              //Confirma la unión de nodos
+
+              TextButton(
+                  onPressed: () {
+                    dem.add(receptorMensaje.text);
+                    setState(() {});
+                    //sale del mensaje
+                    receptorMensaje.clear();
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
+                  child: Text("OK")),
+              //cancela la unión de nodos
+              TextButton(
+                  onPressed: () {
+                    //Cambia el color del nodo inicial a azul
+
+                    setState(() {});
+                    //sale del mensaje
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
+                  child: Text("Cancel")),
+            ],
+          );
+        });
+  }
+
+  _showDialogOf(context, int con) {
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            //Titulo del mensaje
+            title: Text("Ingrese oferta " + con.toString()),
+
+            //TextField para recibir un valor
+            content: Form(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  //Teclado solo tenga numeros
+                  keyboardType: TextInputType.number,
+                  //valor numerico almacenado en receptorMensaje
+                  controller: receptorMensaje,
+                ),
+              ],
+            )),
+            actions: [
+              //Confirma la unión de nodos
+
+              TextButton(
+                  onPressed: () {
+                    of.add(receptorMensaje.text);
+                    setState(() {});
+                    //sale del mensaje
+                    receptorMensaje.clear();
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
+                  child: Text("OK")),
+              //cancela la unión de nodos
+              TextButton(
+                  onPressed: () {
+                    //Cambia el color del nodo inicial a azul
+
+                    setState(() {});
+                    //sale del mensaje
+                    Navigator.of(context).pop();
+                  },
+                  //texto del boton
                   child: Text("Cancel")),
             ],
           );

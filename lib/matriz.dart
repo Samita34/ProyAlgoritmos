@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'modelos.dart';
 
 class matriz extends StatefulWidget {
   final List<List<String>> matrizAdyacencia;
