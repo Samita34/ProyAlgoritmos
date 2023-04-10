@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:grafos/johnson.dart';
+import 'package:grafos/norwest.dart';
 import 'modelos.dart';
 import 'figura.dart';
 //import 'help.dart';
 import 'matriz.dart';
 import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
+import 'norwest.dart';
+
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
 
@@ -52,16 +56,16 @@ class _MyhomeState extends State<Myhome> {
   //Lista auxiliar para remover lineas
   List<ModeloLinea> vLineasRemove = [];
 
-  List<modelo> modeloGuardado=[];
+  List<modelo> modeloGuardado = [];
 
-  int cantN=0,cantL=0;
+  int cantN = 0, cantL = 0;
 
-  TextEditingController tituloGuardado=TextEditingController();
-  
-  TextEditingController descripcionGuardada=TextEditingController();
+  TextEditingController tituloGuardado = TextEditingController();
+
+  TextEditingController descripcionGuardada = TextEditingController();
 
   late int ID;
-  
+
   @override
   void initState() {
     cargaModelo();
@@ -165,9 +169,9 @@ class _MyhomeState extends State<Myhome> {
                         //Muestra una alerta para pedir el nuevo número que será asignado a la conexión
                         _showDialogCambio(context, e, lineaAux);
                       } //else if (verificaConexion(e) == 1) {
-                        //vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1));
-                        //}
-                       else {
+                      //vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1));
+                      //}
+                      else {
                         _showDialog(context, e);
                       }
                     }
@@ -298,11 +302,16 @@ class _MyhomeState extends State<Myhome> {
           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             FloatingActionButton(
               mini: true,
+              heroTag: "matriz",
               onPressed: () {
                 List<List<String>> matrizAdyacencia = [];
+                //Johnson jon = Johnson();
+                Norwest nor = Norwest();
+                matrizAdyacencia = generaMatriz(matrizAdyacencia);
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        matriz(generaMatriz(matrizAdyacencia))));
+                    builder: (context) => matriz(matrizAdyacencia)));
+                nor.calcNor();
+                //print(jon.calcJon(matrizAdyacencia));
               },
               child: const Icon(
                 Icons.apps_outage,
@@ -315,6 +324,7 @@ class _MyhomeState extends State<Myhome> {
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
+              heroTag: "help",
               onPressed: () {
                 showDialog(
                     context: context,
@@ -347,49 +357,49 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-         FloatingActionButton(
-  mini: true,
-  onPressed: () {
-    List<int> asignacionOptima = calcularAsignacionOptima();
-    showDialog(
-      context: context,
-      //El mensaje no se puede saltear
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          //titulo del mensaje
-          title: Text("Asignación óptima"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: asignacionOptima
-                .asMap()
-                .entries
-                .map((entry) => Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                .toList(),
-          ),
-          actions: [
-            //Botón del mensaje de cancelar eliminación
-            TextButton(
-                onPressed: () {
-                  //sale del mensaje
-                  Navigator.of(context).pop();
-                },
-                //Mensaje del botón
-                child: Text("Aceptar")),
-          ],
-        );
-      },
-    );
-  },
-  child: const Icon(
-    Icons.linear_scale, // Cambio del icono a linear_scale
-    size: 40,
-  ),
-),
-
-
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "asignacion",
+              onPressed: () {
+                List<int> asignacionOptima = calcularAsignacionOptima();
+                showDialog(
+                  context: context,
+                  //El mensaje no se puede saltear
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return AlertDialog(
+                      //titulo del mensaje
+                      title: Text("Asignación óptima"),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: asignacionOptima
+                            .asMap()
+                            .entries
+                            .map((entry) => Text(
+                                "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                            .toList(),
+                      ),
+                      actions: [
+                        //Botón del mensaje de cancelar eliminación
+                        TextButton(
+                            onPressed: () {
+                              //sale del mensaje
+                              Navigator.of(context).pop();
+                            },
+                            //Mensaje del botón
+                            child: Text("Aceptar")),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Icon(
+                Icons.linear_scale, // Cambio del icono a linear_scale
+                size: 40,
+              ),
+            ),
             Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
@@ -437,15 +447,13 @@ class _MyhomeState extends State<Myhome> {
                     onTap: () => setState(() {
                           modo = 6;
                           setState(() {
-                            cantN=0;
-                            cantL=0;
-                            String cifraNodo=cifradoNodos();
-                            String cifraLinea=cifradoLineas();
-                            _MensajeGuardado(context,cifraNodo,cifraLinea);
-                            setState(() {
-
+                            cantN = 0;
+                            cantL = 0;
+                            String cifraNodo = cifradoNodos();
+                            String cifraLinea = cifradoLineas();
+                            _MensajeGuardado(context, cifraNodo, cifraLinea);
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.drive_folder_upload),
@@ -454,10 +462,8 @@ class _MyhomeState extends State<Myhome> {
                           modo = 7;
                           setState(() {
                             _MensajeCargar(context);
-                            setState(() {
-
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.clear),
@@ -514,6 +520,7 @@ class _MyhomeState extends State<Myhome> {
     });
     return matrizAdyacencia;
   }
+
   List<int> calcularAsignacionOptima() {
     List<List<String>> matrizAdyacencia = [];
 
@@ -521,15 +528,16 @@ class _MyhomeState extends State<Myhome> {
 
     List<List<int>> matrizAdyacenciaInt = matrizAdyacencia
         .skip(1)
-        .map((fila) => fila.skip(1).map((element) => int.parse(element)).toList())
+        .map((fila) =>
+            fila.skip(1).map((element) => int.parse(element)).toList())
         .toList();
 
     List<int> asignacion = hungarianAlgorithm(matrizAdyacenciaInt);
-    List<int> asignacionOptima = List.generate(asignacion.length, (i) => asignacion[i] + 1);
+    List<int> asignacionOptima =
+        List.generate(asignacion.length, (i) => asignacion[i] + 1);
 
     return asignacionOptima;
   }
-
 
 //Función eliminar lineas, llamada por la función _showDialogEliminar
   void eliminarLineas(ModeloNodo e) {
@@ -844,31 +852,30 @@ class _MyhomeState extends State<Myhome> {
           );
         });
   }
-_MensajeGuardado(context,String cifraNodo,String cifraLinea)
-  {
+
+  _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
     showDialog(
         context: context,
         //El mensaje no se puede saltear
         barrierDismissible: false,
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             //titulo del mensaje
             title: Text("GUARDADO DE GRAFO"),
-            content:Column(
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   //valor numerico almacenado en receptorMensaje
                   controller: tituloGuardado,
                   decoration: InputDecoration(
-                      hintText: 'Introduzca un Nombre',
+                    hintText: 'Introduzca un Nombre',
                   ),
                 ),
                 TextField(
                   controller: descripcionGuardada,
-                  decoration: InputDecoration(
-                    hintText: 'Introduzca una descripción'
-                  ),
+                  decoration:
+                      InputDecoration(hintText: 'Introduzca una descripción'),
                 ),
                 Text('Cantidad de Nodos: ${cantN}'),
                 Text('Cantidad de Conexiones: ${cantL}')
@@ -877,51 +884,48 @@ _MensajeGuardado(context,String cifraNodo,String cifraLinea)
             actions: [
               //Confirma el guardado
               TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     setState(() {
-                      if(modeloGuardado.isEmpty)
-                      {
-                        ID=0;
+                      if (modeloGuardado.isEmpty) {
+                        ID = 0;
+                      } else {
+                        ID = modeloGuardado[modeloGuardado.length - 1].id + 1;
                       }
-                      else
-                      {
-                        ID=modeloGuardado[modeloGuardado.length-1].id+1;
-                      }
-                      DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
+                      DB.insert(modelo(
+                          ID,
+                          tituloGuardado.text,
+                          descripcionGuardada.text,
+                          cifraNodo,
+                          cifraLinea,
+                          cantN,
+                          cantL));
                       cargaModelo();
-                      setState(() {
-
-                      });
-
+                      setState(() {});
                     });
                     Navigator.of(context).pop();
-
                   },
-                  child: Text("OK")
-              ),
+                  child: Text("OK")),
               //cancela el cambio
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")
-              ),
+                  child: Text("Cancel")),
             ],
           );
         });
   }
-  _MensajeCargar(context)
-  {
+
+  _MensajeCargar(context) {
     showDialog(
         context: context,
         //El mensaje no se puede saltear
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             //titulo del mensaje
             title: Text("CARGADO DE GRAFO"),
-            content:Column(
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -944,38 +948,41 @@ _MensajeGuardado(context,String cifraNodo,String cifraLinea)
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(
-
-                                ),
+                                VerticalDivider(),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SingleChildScrollView(
-                                      child: Text('${modeloGuardado[index].Nombre}',overflow: TextOverflow.ellipsis,),
+                                      child: Text(
+                                        '${modeloGuardado[index].Nombre}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       scrollDirection: Axis.horizontal,
                                     ),
-                                    Text('Lineas: ${modeloGuardado[index].cantidadLineas}'),
-                                    Text('Nodos: ${modeloGuardado[index].cantidadNodos}'),
+                                    Text(
+                                        'Lineas: ${modeloGuardado[index].cantidadLineas}'),
+                                    Text(
+                                        'Nodos: ${modeloGuardado[index].cantidadNodos}'),
                                     Text('Descripción:'),
                                     Container(
                                       height: 56,
                                       width: 150,
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.vertical,
-                                        child: Text('${modeloGuardado[index].Descripcion}'),
+                                        child: Text(
+                                            '${modeloGuardado[index].Descripcion}'),
                                       ),
-
                                     )
                                   ],
                                 )
                               ],
                             ),
                             onTap: () {
-                             setState(() {
-                               Navigator.of(context).pop();
-                               _confirmarCargado(context, index);
-                             });
+                              setState(() {
+                                Navigator.of(context).pop();
+                                _confirmarCargado(context, index);
+                              });
                             },
                             onLongPress: () {
                               setState(() {
@@ -984,10 +991,8 @@ _MensajeGuardado(context,String cifraNodo,String cifraLinea)
                               });
                             },
                           ),
-
                         );
                       },
-
                     ),
                   ),
                 ),
@@ -996,153 +1001,158 @@ _MensajeGuardado(context,String cifraNodo,String cifraLinea)
             actions: [
               //Confirma el guardado
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
-
                   },
-                  child: Text("OK")
-              ),
+                  child: Text("OK")),
               //cancela el cambio
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")
-              ),
+                  child: Text("Cancel")),
             ],
           );
         });
   }
-  Future cargaModelo() async{
-    List<modelo> auxModelo= await DB.cargarLista();
+
+  Future cargaModelo() async {
+    List<modelo> auxModelo = await DB.cargarLista();
     setState(() {
-      modeloGuardado=auxModelo;
+      modeloGuardado = auxModelo;
     });
   }
-  _confirmarEliminacion(context,int index)
-  {
+
+  _confirmarEliminacion(context, int index) {
     showDialog(
         context: context,
         //No puede ser salteado
         barrierDismissible: false,
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             //Titulo del mensaje
             title: Text("SEGURO QUE QUIERE ELIMINAR EL GRAFO?"),
             actions: [
               //Confirma la unión de nodos
               TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     setState(() {
                       DB.delete(modeloGuardado[index]);
                       cargaModelo();
                       Navigator.of(context).pop();
-
                     });
                   },
                   //texto del boton
-                  child: Text("OK")
-              ),
+                  child: Text("OK")),
               //cancela la unión de nodos
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
                   //texto del boton
-                  child: Text("Cancel")
-              ),
+                  child: Text("Cancel")),
             ],
           );
         });
   }
-  _confirmarCargado(context,int index)
-  {
+
+  _confirmarCargado(context, int index) {
     showDialog(
         context: context,
         //No puede ser salteado
         barrierDismissible: false,
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             //Titulo del mensaje
             title: Text("SEGURO QUE QUIERE CARGAR EL GRAFO?"),
             actions: [
               //Confirma la unión de nodos
               TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     setState(() {
                       descrifrado(modeloGuardado[index]);
                       Navigator.of(context).pop();
                     });
                   },
                   //texto del boton
-                  child: Text("OK")
-              ),
+                  child: Text("OK")),
               //cancela la unión de nodos
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
                   //texto del boton
-                  child: Text("Cancel")
-              ),
+                  child: Text("Cancel")),
             ],
           );
         });
   }
-  String cifradoNodos(){
-    String cifrado="";
+
+  String cifradoNodos() {
+    String cifrado = "";
     vNodo.forEach((Nodo) {
       cantN++;
-      cifrado=cifrado+Nodo.x.toStringAsPrecision(7)+","+Nodo.y.toStringAsPrecision(7)+","+Nodo.radio.toString()+","+Nodo.codigo+","+Nodo.st.toString()+";";
-    });
-    return cifrado;
-  }
-  String cifradoLineas(){
-    String cifrado="";
-    vLineas.forEach((Linea) {
-      cantL++;
-      cifrado=cifrado+Linea.Ni.codigo+","+Linea.Nf.codigo+","+Linea.valor+","+Linea.tipo.toString()+";";
+      cifrado = cifrado +
+          Nodo.x.toStringAsPrecision(7) +
+          "," +
+          Nodo.y.toStringAsPrecision(7) +
+          "," +
+          Nodo.radio.toString() +
+          "," +
+          Nodo.codigo +
+          "," +
+          Nodo.st.toString() +
+          ";";
     });
     return cifrado;
   }
 
-  void descrifrado(modelo cifrado){
+  String cifradoLineas() {
+    String cifrado = "";
+    vLineas.forEach((Linea) {
+      cantL++;
+      cifrado = cifrado +
+          Linea.Ni.codigo +
+          "," +
+          Linea.Nf.codigo +
+          "," +
+          Linea.valor +
+          "," +
+          Linea.tipo.toString() +
+          ";";
+    });
+    return cifrado;
+  }
+
+  void descrifrado(modelo cifrado) {
     vNodo.clear();
     List<String> ListaNodos = cifrado.Nodos.split(";");
-    for(int i=0;i<cifrado.cantidadNodos;i++)
-    {
-      List<String> Nodo=ListaNodos[i].split(",");
-      vNodo.add(ModeloNodo(double.parse(Nodo[0]), double.parse(Nodo[1]), double.parse(Nodo[2]),Nodo[3],Nodo[3],false));
+    for (int i = 0; i < cifrado.cantidadNodos; i++) {
+      List<String> Nodo = ListaNodos[i].split(",");
+      vNodo.add(ModeloNodo(double.parse(Nodo[0]), double.parse(Nodo[1]),
+          double.parse(Nodo[2]), Nodo[3], Nodo[3], false));
     }
     vLineas.clear();
-    List<String> ListaLineas=cifrado.Lineas.split(";");
+    List<String> ListaLineas = cifrado.Lineas.split(";");
     print(ListaLineas);
-    for(int i=0;i<cifrado.cantidadLineas;i++)
-    {
-      ModeloNodo Nii=vNodo[0];
-      ModeloNodo Nff=vNodo[0];
-      List<String> Linea=ListaLineas[i].split(',');
+    for (int i = 0; i < cifrado.cantidadLineas; i++) {
+      ModeloNodo Nii = vNodo[0];
+      ModeloNodo Nff = vNodo[0];
+      List<String> Linea = ListaLineas[i].split(',');
       vNodo.forEach((Nodo) {
-        if(Nodo.codigo==Linea[0])
-        {
-          Nii=Nodo;
+        if (Nodo.codigo == Linea[0]) {
+          Nii = Nodo;
         }
-        if(Nodo.codigo==Linea[1])
-        {
-          Nff=Nodo;
+        if (Nodo.codigo == Linea[1]) {
+          Nff = Nodo;
         }
       });
       vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
     }
-
   }
 //  void _abrirDartHelp(BuildContext context) {
 //    Navigator.push(
