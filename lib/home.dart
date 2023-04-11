@@ -10,6 +10,7 @@ import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
 import 'norwest.dart';
 import 'matnor.dart';
+import 'asignacion2.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -358,48 +359,58 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "asignacion",
-              onPressed: () {
-                List<int> asignacionOptima = calcularAsignacionOptima();
-                showDialog(
-                  context: context,
-                  //El mensaje no se puede saltear
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return AlertDialog(
-                      //titulo del mensaje
-                      title: Text("Asignación óptima"),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: asignacionOptima
-                            .asMap()
-                            .entries
-                            .map((entry) => Text(
-                                "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                            .toList(),
-                      ),
-                      actions: [
-                        //Botón del mensaje de cancelar eliminación
-                        TextButton(
-                            onPressed: () {
-                              //sale del mensaje
-                              Navigator.of(context).pop();
-                            },
-                            //Mensaje del botón
-                            child: Text("Aceptar")),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Icon(
-                Icons.linear_scale, // Cambio del icono a linear_scale
-                size: 40,
-              ),
+           FloatingActionButton(
+  mini: true,
+  heroTag: "asignacion",
+  onPressed: () {
+    List<int> asignacionOptimaMin = calcularAsignacionOptima();
+    List<int> asignacionOptimaMax = calcularAsignacionOptima2();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Asignación óptima"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Minimización:"),
+                ...asignacionOptimaMin
+                    .asMap()
+                    .entries
+                    .map((entry) =>
+                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                    .toList(),
+                SizedBox(height: 16), // Agregar espacio entre los resultados
+                Text("Maximización:"),
+                ...asignacionOptimaMax
+                    .asMap()
+                    .entries
+                    .map((entry) =>
+                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                    .toList(),
+              ],
             ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Aceptar"),
+            ),
+          ],
+        );
+      },
+    );
+  },
+  child: const Icon(
+    Icons.linear_scale,
+    size: 40,
+  ),
+),
+
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
@@ -567,7 +578,23 @@ class _MyhomeState extends State<Myhome> {
 
     return asignacionOptima;
   }
+   List<int> calcularAsignacionOptima2() {
+    List<List<String>> matrizAdyacencia = [];
 
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+
+    List<List<int>> matrizAdyacenciaInt = matrizAdyacencia
+        .skip(1)
+        .map((fila) =>
+            fila.skip(1).map((element) => int.parse(element)).toList())
+        .toList();
+
+    List<int> asignacion = hungarianAlgorithm2(matrizAdyacenciaInt);
+    List<int> asignacionOptima =
+        List.generate(asignacion.length, (i) => asignacion[i] + 1);
+
+    return asignacionOptima;
+  }
 //Función eliminar lineas, llamada por la función _showDialogEliminar
   void eliminarLineas(ModeloNodo e) {
     //Recorre la lista de Lineas
