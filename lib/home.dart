@@ -369,7 +369,7 @@ class _MyhomeState extends State<Myhome> {
                 creaJon();
               },
               child: const Icon(
-                Icons.mediation,
+                Icons.linear_scale,
                 size: 40,
               ),
             ),
