@@ -406,7 +406,7 @@ class _MyhomeState extends State<Myhome> {
     );
   },
   child: const Icon(
-    Icons.linear_scale,
+    Icons.mediation,
     size: 40,
   ),
 ),
@@ -433,7 +433,7 @@ class _MyhomeState extends State<Myhome> {
                 //print(jon.calcJon(matrizAdyacencia));
               },
               child: const Icon(
-                Icons.apps_outage,
+                Icons.north_west,
                 size: 40,
               ),
               shape: RoundedRectangleBorder(
