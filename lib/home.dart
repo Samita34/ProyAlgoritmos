@@ -11,6 +11,7 @@ import 'dbprueba.dart';
 import 'norwest.dart';
 import 'matnor.dart';
 import 'asignacion2.dart';
+import 'package:flutter/foundation.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -33,6 +34,8 @@ class _MyhomeState extends State<Myhome> {
   int modo = -1;
   //Variable que cuenta la cantidad de nodos
   int contadorNodos = 1;
+  List<String> estj = [];
+  bool estadoj = false;
   /*
   *  Variables que almacenan la posición donde se hace un toque
   * (x,y) variables que detectan el toque
@@ -359,58 +362,71 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-           FloatingActionButton(
-  mini: true,
-  heroTag: "asignacion",
-  onPressed: () {
-    List<int> asignacionOptimaMin = calcularAsignacionOptima();
-    List<int> asignacionOptimaMax = calcularAsignacionOptima2();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Asignación óptima"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Minimización:"),
-                ...asignacionOptimaMin
-                    .asMap()
-                    .entries
-                    .map((entry) =>
-                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                    .toList(),
-                SizedBox(height: 16), // Agregar espacio entre los resultados
-                Text("Maximización:"),
-                ...asignacionOptimaMax
-                    .asMap()
-                    .entries
-                    .map((entry) =>
-                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                    .toList(),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
+            FloatingActionButton(
+              mini: true,
+              heroTag: "johnson",
               onPressed: () {
-                Navigator.of(context).pop();
+                creaJon();
               },
-              child: Text("Aceptar"),
+              child: const Icon(
+                Icons.mediation,
+                size: 40,
+              ),
             ),
-          ],
-        );
-      },
-    );
-  },
-  child: const Icon(
-    Icons.mediation,
-    size: 40,
-  ),
-),
-
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "asignacion",
+              onPressed: () {
+                List<int> asignacionOptimaMin = calcularAsignacionOptima();
+                List<int> asignacionOptimaMax = calcularAsignacionOptima2();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Asignación óptima"),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Minimización:"),
+                            ...asignacionOptimaMin
+                                .asMap()
+                                .entries
+                                .map((entry) => Text(
+                                    "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                                .toList(),
+                            SizedBox(
+                                height:
+                                    16), // Agregar espacio entre los resultados
+                            Text("Maximización:"),
+                            ...asignacionOptimaMax
+                                .asMap()
+                                .entries
+                                .map((entry) => Text(
+                                    "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                                .toList(),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Aceptar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Icon(
+                Icons.mediation,
+                size: 40,
+              ),
+            ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
@@ -487,15 +503,13 @@ class _MyhomeState extends State<Myhome> {
                     onTap: () => setState(() {
                           modo = 6;
                           setState(() {
-                            cantN=0;
-                            cantL=0;
-                            String cifraNodo=cifradoNodos();
-                            String cifraLinea=cifradoLineas();
-                            _Sobrescribir(context,cifraNodo,cifraLinea);
-                            setState(() {
-
+                            cantN = 0;
+                            cantL = 0;
+                            String cifraNodo = cifradoNodos();
+                            String cifraLinea = cifradoLineas();
+                            _Sobrescribir(context, cifraNodo, cifraLinea);
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.save),
@@ -503,15 +517,13 @@ class _MyhomeState extends State<Myhome> {
                     onTap: () => setState(() {
                           modo = 7;
                           setState(() {
-                            cantN=0;
-                            cantL=0;
-                            String cifraNodo=cifradoNodos();
-                            String cifraLinea=cifradoLineas();
-                            _MensajeGuardado(context,cifraNodo,cifraLinea);
-                            setState(() {
-
+                            cantN = 0;
+                            cantL = 0;
+                            String cifraNodo = cifradoNodos();
+                            String cifraLinea = cifradoLineas();
+                            _MensajeGuardado(context, cifraNodo, cifraLinea);
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.drive_folder_upload),
@@ -596,7 +608,8 @@ class _MyhomeState extends State<Myhome> {
 
     return asignacionOptima;
   }
-   List<int> calcularAsignacionOptima2() {
+
+  List<int> calcularAsignacionOptima2() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -613,6 +626,7 @@ class _MyhomeState extends State<Myhome> {
 
     return asignacionOptima;
   }
+
 //Función eliminar lineas, llamada por la función _showDialogEliminar
   void eliminarLineas(ModeloNodo e) {
     //Recorre la lista de Lineas
@@ -1039,16 +1053,16 @@ class _MyhomeState extends State<Myhome> {
           );
         });
   }
- _Sobrescribir(context,String cifraNodo,String cifraLinea)
-  {
+
+  _Sobrescribir(context, String cifraNodo, String cifraLinea) {
     showDialog(
         context: context,
         //El mensaje no se puede saltear
-        builder: (context){
+        builder: (context) {
           return AlertDialog(
             //titulo del mensaje
             title: Text("GRAFO A SOBRESCRIBIR"),
-            content:Column(
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1071,26 +1085,30 @@ class _MyhomeState extends State<Myhome> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(
-
-                                ),
+                                VerticalDivider(),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SingleChildScrollView(
-                                      child: Text('${modeloGuardado[index].Nombre}',overflow: TextOverflow.ellipsis,),
+                                      child: Text(
+                                        '${modeloGuardado[index].Nombre}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       scrollDirection: Axis.horizontal,
                                     ),
-                                    Text('Lineas: ${modeloGuardado[index].cantidadLineas}'),
-                                    Text('Nodos: ${modeloGuardado[index].cantidadNodos}'),
+                                    Text(
+                                        'Lineas: ${modeloGuardado[index].cantidadLineas}'),
+                                    Text(
+                                        'Nodos: ${modeloGuardado[index].cantidadNodos}'),
                                     Text('Descripción:'),
                                     Container(
                                       height: 56,
                                       width: 150,
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.vertical,
-                                        child: Text('${modeloGuardado[index].Descripcion}'),
+                                        child: Text(
+                                            '${modeloGuardado[index].Descripcion}'),
                                       ),
                                     )
                                   ],
@@ -1102,16 +1120,21 @@ class _MyhomeState extends State<Myhome> {
                                 DB.delete(modeloGuardado[index]);
                                 cargaModelo();
                                 Navigator.of(context).pop();
-                                ID=index+1;
-                                DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
+                                ID = index + 1;
+                                DB.insert(modelo(
+                                    ID,
+                                    tituloGuardado.text,
+                                    descripcionGuardada.text,
+                                    cifraNodo,
+                                    cifraLinea,
+                                    cantN,
+                                    cantL));
                                 cargaModelo();
                               });
                             },
                           ),
-
                         );
                       },
-
                     ),
                   ),
                 ),
@@ -1120,27 +1143,23 @@ class _MyhomeState extends State<Myhome> {
             actions: [
               //Confirma el guardado
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
-
                   },
-                  child: Text("OK")
-              ),
+                  child: Text("OK")),
               //cancela el cambio
               TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
+                  onPressed: () {
+                    setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")
-              ),
+                  child: Text("Cancel")),
             ],
           );
         });
   }
+
   _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
     showDialog(
         context: context,
@@ -1442,10 +1461,63 @@ class _MyhomeState extends State<Myhome> {
       vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
     }
   }
+
 //  void _abrirDartHelp(BuildContext context) {
 //    Navigator.push(
 //      context,
 //      MaterialPageRoute(builder: (context) => Help()),
 //    );
 //  }
+  creaJon() {
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    Johnson jon = Johnson();
+    int i = 1;
+    var aux = jon.calcJon(matrizAdyacencia);
+    llenalis(aux);
+    //estj=List<String>.from(aux);
+    print(comparaLis(aux, estj));
+    if (comparaLis(aux, estj) == true) {
+      estadoj = !estadoj;
+    } else {
+      estadoj = true;
+    }
+
+    if (estadoj == true) {
+      vLineas.forEach((linea) {
+        if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
+          linea.tipo = 5;
+          i++;
+        }
+      });
+    } else {
+      vLineas.forEach((linea) {
+        linea.tipo = 1;
+      });
+    }
+  }
+
+  llenalis(List<String> l) {
+    estj.clear();
+    for (int i = 0; i < l.length; i++) {
+      estj.add(l[i]);
+    }
+  }
+
+  bool comparaLis(List<String> l1, List<String> l2) {
+    int t1 = l1.length;
+    int t2 = l2.length;
+    int s = 0;
+    if (t1 == t2) {
+      for (int i = 0; i < t1; i++) {
+        if (identical(l1[i], l2[i])) {
+          s++;
+        }
+      }
+    }
+    if (s == t1) {
+      return true;
+    }
+    return false;
+  }
 }

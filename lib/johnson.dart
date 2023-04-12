@@ -24,6 +24,6 @@ class Johnson {
     for (int i = 0; i < rutaMasLarga.length; i++) {
       rutaNodos.add(mat[0][rutaMasLarga[i]]);
     }
-    return [sm, rutaNodos];
+    return rutaNodos;
   }
 }

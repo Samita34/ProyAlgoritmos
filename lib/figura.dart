@@ -143,6 +143,37 @@ class Lineas extends CustomPainter {
         canvas.drawPath(path, headPaint);
 
         _msg((xi + xf) / 2, (yi + yf) / 2, e.valor.toString(), canvas);
+      } else if (e.tipo == 5) {
+        final double arrowLenght = 25;
+        final double dx = e.Nf.x - e.Ni.x;
+        final double dy = e.Nf.y - e.Ni.y;
+        final double angle = math.atan2(dy, dx);
+        final double xi = e.Ni.x + arrowLenght * math.cos(angle + 0.5);
+        final double yi = e.Ni.y + arrowLenght * math.sin(angle + 0.5);
+        final double xf = e.Nf.x - arrowLenght * math.cos(angle - 0.5);
+        final double yf = e.Nf.y - arrowLenght * math.sin(angle - 0.5);
+        final arrowStart = Offset(xi, yi);
+        final arrowEnd = Offset(xf, yf);
+        final linePaint = Paint()
+          ..color = Color.fromRGBO(2, 241, 34, 1)
+          ..strokeWidth = 2.0;
+        canvas.drawLine(arrowStart, arrowEnd, linePaint);
+
+        final headPaint = Paint()
+          ..color = Color.fromRGBO(2, 241, 34, 1)
+          ..strokeWidth = 2.0
+          ..style = PaintingStyle.fill;
+
+        Path path = Path() //===> Esto es para hacer la cabeza de la flecha
+          ..moveTo(arrowEnd.dx, arrowEnd.dy)
+          ..lineTo(arrowEnd.dx - arrowLenght * math.cos(angle - math.pi / 10),
+              arrowEnd.dy - arrowLenght * math.sin(angle - math.pi / 10))
+          ..lineTo(arrowEnd.dx - arrowLenght * math.cos(angle + math.pi / 10),
+              arrowEnd.dy - arrowLenght * math.sin(angle + math.pi / 10))
+          ..close(); //Cerramos la cabeza para que quede con un relleno negro
+        canvas.drawPath(path, headPaint);
+
+        _msg((xi + xf) / 2, (yi + yf) / 2, e.valor.toString(), canvas);
       } else {
         final double radio = 35;
         final double anguloFlecha = math.pi / 5;
