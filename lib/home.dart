@@ -378,8 +378,11 @@ class _MyhomeState extends State<Myhome> {
               mini: true,
               heroTag: "asignacion",
               onPressed: () {
-                List<int> asignacionOptimaMin = calcularAsignacionOptima();
-                List<int> asignacionOptimaMax = calcularAsignacionOptima2();
+                List<List<String>> asignacionOptimaMin =
+                    calcularAsignacionOptima();
+                List<List<String>> asignacionOptimaMax =
+                    calcularAsignacionOptima2();
+                print(asignacionOptimaMin);
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -395,7 +398,7 @@ class _MyhomeState extends State<Myhome> {
                                 .asMap()
                                 .entries
                                 .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                 .toList(),
                             SizedBox(
                                 height:
@@ -405,7 +408,7 @@ class _MyhomeState extends State<Myhome> {
                                 .asMap()
                                 .entries
                                 .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
+                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                 .toList(),
                           ],
                         ),
@@ -591,7 +594,7 @@ class _MyhomeState extends State<Myhome> {
     return matrizAdyacencia;
   }
 
-  List<int> calcularAsignacionOptima() {
+  List<List<String>> calcularAsignacionOptima() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -603,13 +606,20 @@ class _MyhomeState extends State<Myhome> {
         .toList();
 
     List<int> asignacion = hungarianAlgorithm(matrizAdyacenciaInt);
-    List<int> asignacionOptima =
-        List.generate(asignacion.length, (i) => asignacion[i] + 1);
 
-    return asignacionOptima;
+    List<List<String>> noms = [];
+    for (int i = 1; i < matrizAdyacencia.length; i++) {
+      if (asignacion[i - 1] != -1) {
+        noms.add([
+          matrizAdyacencia[0][i],
+          matrizAdyacencia[0][asignacion[i - 1] + 1]
+        ]);
+      }
+    }
+    return noms;
   }
 
-  List<int> calcularAsignacionOptima2() {
+  List<List<String>> calcularAsignacionOptima2() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -621,10 +631,16 @@ class _MyhomeState extends State<Myhome> {
         .toList();
 
     List<int> asignacion = hungarianAlgorithm2(matrizAdyacenciaInt);
-    List<int> asignacionOptima =
-        List.generate(asignacion.length, (i) => asignacion[i] + 1);
-
-    return asignacionOptima;
+    List<List<String>> noms = [];
+    for (int i = 1; i < matrizAdyacencia.length; i++) {
+      if (asignacion[i - 1] != -1) {
+        noms.add([
+          matrizAdyacencia[0][i],
+          matrizAdyacencia[0][asignacion[i - 1] + 1]
+        ]);
+      }
+    }
+    return noms;
   }
 
 //Función eliminar lineas, llamada por la función _showDialogEliminar
