@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 class matnor extends StatefulWidget {
   final List<List<String>> matriznor;
   final List<List<String>> matrizini;
-  const matnor(this.matrizini, this.matriznor, {Key? key}) : super(key: key);
+  final int sum;
+  const matnor(this.matrizini, this.matriznor, this.sum, {Key? key})
+      : super(key: key);
 
   @override
-  State<matnor> createState() => _matnorState(matrizini, matriznor);
+  State<matnor> createState() => _matnorState(matrizini, matriznor, sum);
 }
 
 class _matnorState extends State<matnor> {
   final List<List<String>> matriznor;
   final List<List<String>> matrizini;
-  _matnorState(this.matrizini, this.matriznor);
+  final int sum;
+  _matnorState(this.matrizini, this.matriznor, this.sum);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,12 +23,13 @@ class _matnorState extends State<matnor> {
         title: Text("Matriz de adyacencia"),
       ),
       body: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Color(0xFF2D2D34),
-          ),
-          child: Table(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Color(0xFF2D2D34),
+        ),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Table(
             border: TableBorder.all(color: Colors.grey),
             children: matriznor.asMap().entries.map((entry) {
               int rowIndex = entry.key;
@@ -109,7 +113,16 @@ class _matnorState extends State<matnor> {
                 }).toList(),
               );
             }).toList(),
-          )),
+          ),
+          Text(
+            "Total: ${sum}",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+            ),
+          )
+        ]),
+      ),
     );
   }
 }

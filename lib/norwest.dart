@@ -47,13 +47,13 @@ class Norwest {
     }
     for (int i = 1; i < n; i++) {
       for (int j = 1; j < n; j++) {
-        if (!identical("", aux[i - 1][j - 1])) {
-          s += int.parse(aux[i - 1][j - 1]) * int.parse(mat[i][j]);
+        if (!identical("", aux[j - 1][i - 1])) {
+          s += int.parse(aux[j - 1][i - 1]) * int.parse(mat[i][j]);
         }
       }
     }
-    print(aux);
-    return aux;
+
+    return [s, aux];
   }
 
   int sums(List<String> vec) {
