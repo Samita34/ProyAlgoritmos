@@ -142,3 +142,57 @@ class modelo {
     };
   }
 }
+class ModeloGrafo {
+  final String id;
+  final String nombre;
+  final String descripcion;
+  final String nodos;
+  final String lineas;
+  final int cantidadNodos;
+  final int cantidadLineas;
+
+  ModeloGrafo({
+    required this.id,
+    required this.nombre,
+    required this.descripcion,
+    required this.nodos,
+    required this.lineas,
+    required this.cantidadNodos,
+    required this.cantidadLineas,
+  });
+
+  ModeloGrafo.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        nombre = json['nombre'],
+        descripcion = json['descripcion'],
+        nodos = json['nodos'],
+        lineas = json['lineas'],
+        cantidadNodos = json['cantidadNodos'],
+        cantidadLineas = json['cantidadLineas'];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'descripcion': descripcion,
+      'nodos': nodos,
+      'lineas': lineas,
+      'cantidadNodos': cantidadNodos,
+      'cantidadLineas': cantidadLineas,
+    };
+  }
+  factory ModeloGrafo.fromMap(Map<String, dynamic> data, String documentId) {
+  return ModeloGrafo(
+    id: documentId,
+    nombre: data['Nombre'] ?? '',
+    descripcion: data['Descripcion'] ?? '',
+    nodos: data['Nodos'] ?? '',
+    lineas: data['Lineas'] ?? '',
+    cantidadNodos: data['cantidadNodos'] ?? 0,
+    cantidadLineas: data['cantidadLineas'] ?? 0,
+  );
+}
+}
+
+
+

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:grafos/johnson.dart';
@@ -1039,272 +1040,333 @@ class _MyhomeState extends State<Myhome> {
           );
         });
   }
- _Sobrescribir(context,String cifraNodo,String cifraLinea)
-  {
-    showDialog(
-        context: context,
-        //El mensaje no se puede saltear
-        builder: (context){
-          return AlertDialog(
-            //titulo del mensaje
-            title: Text("GRAFO A SOBRESCRIBIR"),
-            content:Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Seleccione:'),
-                Container(
-                  color: Colors.blue,
-                  height: 300,
-                  width: 250,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: modeloGuardado.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: ListTile(
-                            title: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(
+ _Sobrescribir(BuildContext context, String cifraNodo, String cifraLinea) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("GRAFO A SOBRESCRIBIR"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Seleccione:'),
+            Container(
+              color: Colors.blue,
+              height: 300,
+              width: 250,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('grafo').snapshots(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
 
+                  return ListView(
+                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                      ModeloGrafo modelo = ModeloGrafo.fromMap(document.data() as Map<String, dynamic>, document.id);
+
+                      return Card(
+                        child: ListTile(
+                          title: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('${modelo.id}'),
+                                    ],
+                                  ),
                                 ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SingleChildScrollView(
-                                      child: Text('${modeloGuardado[index].Nombre}',overflow: TextOverflow.ellipsis,),
-                                      scrollDirection: Axis.horizontal,
-                                    ),
-                                    Text('Lineas: ${modeloGuardado[index].cantidadLineas}'),
-                                    Text('Nodos: ${modeloGuardado[index].cantidadNodos}'),
-                                    Text('Descripción:'),
-                                    Container(
-                                      height: 56,
-                                      width: 150,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: Text('${modeloGuardado[index].Descripcion}'),
+                                VerticalDivider(),
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SingleChildScrollView(
+                                        child: Text('${modelo.nombre}', overflow: TextOverflow.ellipsis,),
+                                        scrollDirection: Axis.horizontal,
                                       ),
-                                    )
-                                  ],
+                                      SizedBox(height: 4),
+                                      Text('Lineas: ${modelo.cantidadLineas}'),
+                                      Text('Nodos: ${modelo.cantidadNodos}'),
+                                      Text('Descripción:'),
+                                      Container(
+                                        height: 56,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: Text('${modelo.descripcion}'),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
-                            onTap: () {
-                              setState(() {
-                                DB.delete(modeloGuardado[index]);
-                                cargaModelo();
-                                Navigator.of(context).pop();
-                                ID=index+1;
-                                DB.insert(modelo(ID,tituloGuardado.text,descripcionGuardada.text,cifraNodo,cifraLinea,cantN,cantL));
-                                cargaModelo();
-                              });
-                            },
                           ),
+                          onTap: () async {
+                            setState(() {
+                              Navigator.of(context).pop();
+                            });
 
-                        );
-                      },
+                            await FirebaseFirestore.instance.collection('grafo').doc(modelo.id).update({
+                              'Nombre': tituloGuardado.text,
+                              'Descripcion': descripcionGuardada.text,
+                              'Nodos': cifraNodo,
+                              'Lineas': cifraLinea,
+                              'cantidadNodos': cantN,
+                              'cantidadLineas': cantL
+                            });
 
-                    ),
-                  ),
-                ),
-              ],
+                            // Limpiar los campos de texto después de guardar
+                            tituloGuardado.clear();
+                            descripcionGuardada.clear();
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
             ),
-            actions: [
-              //Confirma el guardado
-              TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
-                    Navigator.of(context).pop();
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.of(context).pop();
+            },
+            child: Text("OK"),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.of(context).pop();
+            },
+            child: Text("Cancel"),
+          ),
+        ],
+      );
+    },
+  );
+}
 
-                  },
-                  child: Text("OK")
-              ),
-              //cancela el cambio
-              TextButton(
-                  onPressed: (){
-                    setState(() {
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel")
-              ),
-            ],
-          );
-        });
+
+  Future<void> createDocumentWithSequentialId(String nombre, String descripcion, String nodos, String lineas, int cantidadNodos, int cantidadLineas) async {
+  String cifraNodo = cifradoNodos();
+  String cifraLinea = cifradoLineas();
+  CollectionReference collection = FirebaseFirestore.instance.collection('grafo');
+
+  QuerySnapshot snapshot = await collection.orderBy(FieldPath.documentId).limitToLast(1).get();
+
+  int lastId = 0;
+  if (snapshot.docs.isNotEmpty) {
+    String lastDocId = snapshot.docs.first.id;
+    String lastSequentialId = lastDocId.replaceFirst('grafoid', '');
+    lastId = int.tryParse(lastSequentialId) ?? 0;
   }
+
+  String nextId = 'grafoid${lastId + 1}';
+
+  await collection.doc(nextId).set({
+     'nombre': nombre,
+    'descripcion': descripcion,
+    'nodos': cifraNodo,
+    'lineas': cifraLinea,
+    'cantidadNodos': cantN,
+    'cantidadLineas': cantL,
+  });
+}
+Future<ModeloGrafo?> loadGraph(String documentId) async {
+  DocumentReference docRef = FirebaseFirestore.instance.collection('grafo').doc(documentId);
+  DocumentSnapshot docSnapshot = await docRef.get();
+
+  if (docSnapshot.exists) {
+    Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+    ModeloGrafo modeloCifrado = ModeloGrafo.fromJson(data);
+    return modeloCifrado;
+  } else {
+    print("Documento no encontrado");
+    return null;
+  }
+  
+}
+
+
   _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
-    showDialog(
-        context: context,
-        //El mensaje no se puede saltear
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            //titulo del mensaje
-            title: Text("GUARDADO DE GRAFO"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  //valor numerico almacenado en receptorMensaje
-                  controller: tituloGuardado,
-                  decoration: InputDecoration(
-                    hintText: 'Introduzca un Nombre',
-                  ),
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("GUARDADO DE GRAFO"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: tituloGuardado,
+                decoration: InputDecoration(
+                  hintText: 'Introduzca un Nombre',
                 ),
-                TextField(
-                  controller: descripcionGuardada,
-                  decoration:
-                      InputDecoration(hintText: 'Introduzca una descripción'),
-                ),
-                Text('Cantidad de Nodos: ${cantN}'),
-                Text('Cantidad de Conexiones: ${cantL}')
-              ],
-            ),
-            actions: [
-              //Confirma el guardado
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      if (modeloGuardado.isEmpty) {
-                        ID = 0;
-                      } else {
-                        ID = modeloGuardado[modeloGuardado.length - 1].id + 1;
-                      }
-                      DB.insert(modelo(
-                          ID,
-                          tituloGuardado.text,
-                          descripcionGuardada.text,
-                          cifraNodo,
-                          cifraLinea,
-                          cantN,
-                          cantL));
-                      cargaModelo();
-                      setState(() {});
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK")),
-              //cancela el cambio
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel")),
+              ),
+              TextField(
+                controller: descripcionGuardada,
+                decoration:
+                    InputDecoration(hintText: 'Introduzca una descripción'),
+              ),
+              Text('Cantidad de Nodos: ${cantN}'),
+              Text('Cantidad de Conexiones: ${cantL}')
             ],
-          );
-        });
-  }
+          ),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  String id = 'grafoid' + DateTime.now().millisecondsSinceEpoch.toString();
+
+                  await FirebaseFirestore.instance.collection('grafo').doc(id).set({
+                    'id': id,
+                    'Nombre': tituloGuardado.text,
+                    'Descripcion': descripcionGuardada.text,
+                    'Nodos': cifraNodo,
+                    'Lineas': cifraLinea,
+                    'cantidadNodos': cantN,
+                    'cantidadLineas': cantL
+                  });
+
+                  // Limpiar los campos de texto después de guardar
+                  tituloGuardado.clear();
+                  descripcionGuardada.clear();
+
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK")),
+            TextButton(
+                onPressed: () {
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel")),
+          ],
+        );
+      });
+}
+
 
   _MensajeCargar(context) {
-    showDialog(
-        context: context,
-        //El mensaje no se puede saltear
-        builder: (context) {
-          return AlertDialog(
-            //titulo del mensaje
-            title: Text("CARGADO DE GRAFO"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Seleccione la configuración:'),
-                Container(
-                  color: Colors.blue,
-                  height: 300,
-                  width: 250,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: modeloGuardado.length,
-                      itemBuilder: (context, index) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("CARGADO DE GRAFO"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Seleccione la configuración:'),
+              Container(
+                color: Colors.blue,
+                height: 300,
+                width: 250,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('grafo').snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+
+                    return ListView(
+                      children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                        ModeloGrafo modelo = ModeloGrafo.fromMap(document.data() as Map<String, dynamic>, document.id);
+
                         return Card(
                           child: ListTile(
                             title: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text('${modeloGuardado[index].id}'),
+                                Text('${modelo.id}'),
                                 VerticalDivider(),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SingleChildScrollView(
-                                      child: Text(
-                                        '${modeloGuardado[index].Nombre}',
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      scrollDirection: Axis.horizontal,
-                                    ),
-                                    Text(
-                                        'Lineas: ${modeloGuardado[index].cantidadLineas}'),
-                                    Text(
-                                        'Nodos: ${modeloGuardado[index].cantidadNodos}'),
-                                    Text('Descripción:'),
-                                    Container(
-                                      height: 56,
-                                      width: 150,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
+                                Flexible(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SingleChildScrollView(
                                         child: Text(
-                                            '${modeloGuardado[index].Descripcion}'),
+                                          '${modelo.nombre}',
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        scrollDirection: Axis.horizontal,
                                       ),
-                                    )
-                                  ],
+                                      Text('Lineas: ${modelo.cantidadLineas}'),
+                                      Text('Nodos: ${modelo.cantidadNodos}'),
+                                      Text('Descripción:'),
+                                      Container(
+                                        height: 56,
+                                        width: 150,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: Text('${modelo.descripcion}'),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
                             onTap: () {
                               setState(() {
                                 Navigator.of(context).pop();
-                                _confirmarCargado(context, index);
+                                _confirmarCargado(context, modelo);
                               });
                             },
                             onLongPress: () {
                               setState(() {
                                 Navigator.of(context).pop();
-                                _confirmarEliminacion(context, index);
+                                _confirmarEliminacion(context, modelo);
                               });
                             },
                           ),
                         );
-                      },
-                    ),
-                  ),
+                      }).toList(),
+                    );
+                  },
                 ),
-              ],
-            ),
-            actions: [
-              //Confirma el guardado
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK")),
-              //cancela el cambio
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel")),
+              ),
             ],
-          );
-        });
-  }
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK")),
+            TextButton(
+                onPressed: () {
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel")),
+          ],
+        );
+      });
+}
+
+
 
   Future cargaModelo() async {
     List<modelo> auxModelo = await DB.cargarLista();
@@ -1312,74 +1374,65 @@ class _MyhomeState extends State<Myhome> {
       modeloGuardado = auxModelo;
     });
   }
+_confirmarCargado(BuildContext context, ModeloGrafo modelo) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("CONFIRMACIÓN DE CARGA"),
+        content: Text("¿Está seguro de que desea cargar el grafo '${modelo.nombre}'?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  descrifrado(modelo);
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("OK")),
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("Cancel")),
+        ],
+      );
+    },
+  );
+}
 
-  _confirmarEliminacion(context, int index) {
-    showDialog(
-        context: context,
-        //No puede ser salteado
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            //Titulo del mensaje
-            title: Text("SEGURO QUE QUIERE ELIMINAR EL GRAFO?"),
-            actions: [
-              //Confirma la unión de nodos
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      DB.delete(modeloGuardado[index]);
-                      cargaModelo();
-                      Navigator.of(context).pop();
-                    });
-                  },
-                  //texto del boton
-                  child: Text("OK")),
-              //cancela la unión de nodos
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  //texto del boton
-                  child: Text("Cancel")),
-            ],
-          );
-        });
-  }
+_confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("CONFIRMACIÓN DE ELIMINACIÓN"),
+        content: Text("¿Está seguro de que desea eliminar el grafo '${modelo.nombre}'?"),
+        actions: [
+          TextButton(
+              onPressed: () async {
+                await FirebaseFirestore.instance.collection('grafo').doc(modelo.id).delete();
+                setState(() {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("OK")),
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("Cancel")),
+        ],
+      );
+    },
+  );
+}
 
-  _confirmarCargado(context, int index) {
-    showDialog(
-        context: context,
-        //No puede ser salteado
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            //Titulo del mensaje
-            title: Text("SEGURO QUE QUIERE CARGAR EL GRAFO?"),
-            actions: [
-              //Confirma la unión de nodos
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      descrifrado(modeloGuardado[index]);
-                      Navigator.of(context).pop();
-                    });
-                  },
-                  //texto del boton
-                  child: Text("OK")),
-              //cancela la unión de nodos
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  //texto del boton
-                  child: Text("Cancel")),
-            ],
-          );
-        });
-  }
-
+  
   String cifradoNodos() {
     String cifrado = "";
     vNodo.forEach((Nodo) {
@@ -1416,32 +1469,33 @@ class _MyhomeState extends State<Myhome> {
     return cifrado;
   }
 
-  void descrifrado(modelo cifrado) {
-    vNodo.clear();
-    List<String> ListaNodos = cifrado.Nodos.split(";");
-    for (int i = 0; i < cifrado.cantidadNodos; i++) {
-      List<String> Nodo = ListaNodos[i].split(",");
-      vNodo.add(ModeloNodo(double.parse(Nodo[0]), double.parse(Nodo[1]),
-          double.parse(Nodo[2]), Nodo[3], Nodo[3], false));
-    }
-    vLineas.clear();
-    List<String> ListaLineas = cifrado.Lineas.split(";");
-    print(ListaLineas);
-    for (int i = 0; i < cifrado.cantidadLineas; i++) {
-      ModeloNodo Nii = vNodo[0];
-      ModeloNodo Nff = vNodo[0];
-      List<String> Linea = ListaLineas[i].split(',');
-      vNodo.forEach((Nodo) {
-        if (Nodo.codigo == Linea[0]) {
-          Nii = Nodo;
-        }
-        if (Nodo.codigo == Linea[1]) {
-          Nff = Nodo;
-        }
-      });
-      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
-    }
+ void descrifrado(ModeloGrafo cifrado) {
+  vNodo.clear();
+  List<String> ListaNodos = cifrado.nodos.split(";");
+  for (int i = 0; i < cifrado.cantidadNodos; i++) {
+    List<String> Nodo = ListaNodos[i].split(",");
+    vNodo.add(ModeloNodo(double.parse(Nodo[0]), double.parse(Nodo[1]),
+        double.parse(Nodo[2]), Nodo[3], Nodo[3], false));
   }
+  vLineas.clear();
+  List<String> ListaLineas = cifrado.lineas.split(";");
+  print(ListaLineas);
+  for (int i = 0; i < cifrado.cantidadLineas; i++) {
+    ModeloNodo Nii = vNodo[0];
+    ModeloNodo Nff = vNodo[0];
+    List<String> Linea = ListaLineas[i].split(',');
+    vNodo.forEach((Nodo) {
+      if (Nodo.codigo == Linea[0]) {
+        Nii = Nodo;
+      }
+      if (Nodo.codigo == Linea[1]) {
+        Nff = Nodo;
+      }
+    });
+    vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
+  }
+}
+
 //  void _abrirDartHelp(BuildContext context) {
 //    Navigator.push(
 //      context,
