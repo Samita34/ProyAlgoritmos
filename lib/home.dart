@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:grafos/johnson.dart';
 import 'package:grafos/norwest.dart';
@@ -11,7 +12,9 @@ import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
 import 'norwest.dart';
 import 'matnor.dart';
+import 'dart:io';
 import 'asignacion2.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -34,6 +37,8 @@ class _MyhomeState extends State<Myhome> {
   int modo = -1;
   //Variable que cuenta la cantidad de nodos
   int contadorNodos = 1;
+  bool estadoj = false;
+  List<String> estj = [];
   /*
   *  Variables que almacenan la posición donde se hace un toque
   * (x,y) variables que detectan el toque
@@ -73,7 +78,10 @@ class _MyhomeState extends State<Myhome> {
 
   @override
   void initState() {
-    cargaModelo();
+    if (!kIsWeb && !Platform.isWindows) {
+      cargaModelo();
+    }
+
     super.initState();
   }
 
@@ -360,81 +368,99 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-           FloatingActionButton(
-  mini: true,
-  heroTag: "asignacion",
-  onPressed: () {
-    List<int> asignacionOptimaMin = calcularAsignacionOptima();
-    List<int> asignacionOptimaMax = calcularAsignacionOptima2();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Asignación óptima"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Minimización:"),
-                ...asignacionOptimaMin
-                    .asMap()
-                    .entries
-                    .map((entry) =>
-                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                    .toList(),
-                SizedBox(height: 16), // Agregar espacio entre los resultados
-                Text("Maximización:"),
-                ...asignacionOptimaMax
-                    .asMap()
-                    .entries
-                    .map((entry) =>
-                        Text("Tarea ${entry.key + 1}: Asignada a ${entry.value}"))
-                    .toList(),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
+            FloatingActionButton(
+              mini: true,
+              heroTag: "johnson",
               onPressed: () {
-                Navigator.of(context).pop();
+                creaJon();
               },
-              child: Text("Aceptar"),
+              child: const Icon(
+                Icons.linear_scale,
+                size: 40,
+              ),
             ),
-          ],
-        );
-      },
-    );
-  },
-  child: const Icon(
-    Icons.linear_scale,
-    size: 40,
-  ),
-),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "asignacion",
+              onPressed: () {
+                List<dynamic> asignacionOptimaMin = calcularAsignacionOptima();
+                List<dynamic> asignacionOptimaMax = calcularAsignacionOptima2();
+                print(asignacionOptimaMin);
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Asignación óptima"),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Minimización:"),
+                            ...asignacionOptimaMin[1]
+                                .asMap()
+                                .entries
+                                .map((entry) => Text(
+                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                .toList(),
+                            SizedBox(height: 16),
+                            Text("Sumatoria: ${asignacionOptimaMin[0]}"),
 
+                            SizedBox(
+                                height:
+                                    16), // Agregar espacio entre los resultados
+                            Text("Maximización:"),
+                            ...asignacionOptimaMax[1]
+                                .asMap()
+                                .entries
+                                .map((entry) => Text(
+                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                .toList(),
+                            SizedBox(height: 16),
+                            Text("Sumatoria: ${asignacionOptimaMax[0]}"),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Aceptar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Icon(
+                Icons.mediation,
+                size: 40,
+              ),
+            ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
               heroTag: "norwest",
-              onPressed: () {
+              onPressed: () async {
                 of = [];
                 dem = [];
 
                 List<List<String>> matrizAdyacencia = [];
-
                 matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                _showDialogOf(context, 1);
-                _showDialogDem(context, 1);
-
-                //for (int i = 0; i < matrizAdyacencia.length; i++) {
+                continueDialogs = true;
+                //showDialogSequence(context, 1, matrizAdyacencia, of, dem);
+                await _showDialogsDem(context, matrizAdyacencia, of, dem);
+                await _showDialogsOf(context, matrizAdyacencia, of, dem);
+                //for  (int i = 0; i < matrizAdyacencia.length; i++) {
                 //  _showDialogDem(context, i - 1);
                 //}
 
                 //print(jon.calcJon(matrizAdyacencia));
               },
               child: const Icon(
-                Icons.apps_outage,
+                Icons.north_west,
                 size: 40,
               ),
               shape: RoundedRectangleBorder(
@@ -488,15 +514,13 @@ class _MyhomeState extends State<Myhome> {
                     onTap: () => setState(() {
                           modo = 6;
                           setState(() {
-                            cantN=0;
-                            cantL=0;
-                            String cifraNodo=cifradoNodos();
-                            String cifraLinea=cifradoLineas();
-                            _Sobrescribir(context,cifraNodo,cifraLinea);
-                            setState(() {
-
+                            cantN = 0;
+                            cantL = 0;
+                            String cifraNodo = cifradoNodos();
+                            String cifraLinea = cifradoLineas();
+                            _Sobrescribir(context, cifraNodo, cifraLinea);
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.save),
@@ -504,15 +528,13 @@ class _MyhomeState extends State<Myhome> {
                     onTap: () => setState(() {
                           modo = 7;
                           setState(() {
-                            cantN=0;
-                            cantL=0;
-                            String cifraNodo=cifradoNodos();
-                            String cifraLinea=cifradoLineas();
-                            _MensajeGuardado(context,cifraNodo,cifraLinea);
-                            setState(() {
-
+                            cantN = 0;
+                            cantL = 0;
+                            String cifraNodo = cifradoNodos();
+                            String cifraLinea = cifradoLineas();
+                            _MensajeGuardado(context, cifraNodo, cifraLinea);
+                            setState(() {});
                           });
-                  });
                         })),
                 SpeedDialChild(
                     child: Icon(Icons.drive_folder_upload),
@@ -580,7 +602,7 @@ class _MyhomeState extends State<Myhome> {
     return matrizAdyacencia;
   }
 
-  List<int> calcularAsignacionOptima() {
+  List<dynamic> calcularAsignacionOptima() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -592,12 +614,22 @@ class _MyhomeState extends State<Myhome> {
         .toList();
 
     List<int> asignacion = hungarianAlgorithm(matrizAdyacenciaInt);
-    List<int> asignacionOptima =
-        List.generate(asignacion.length, (i) => asignacion[i] + 1);
 
-    return asignacionOptima;
+    List<List<String>> noms = [];
+    int sumatoria = 0;
+    for (int i = 1; i < matrizAdyacencia.length; i++) {
+      if (asignacion[i - 1] != -1) {
+        noms.add([
+          matrizAdyacencia[0][i],
+          matrizAdyacencia[0][asignacion[i - 1] + 1]
+        ]);
+        sumatoria += matrizAdyacenciaInt[i - 1][asignacion[i - 1]];
+      }
+    }
+    return [sumatoria, noms];
   }
-   List<int> calcularAsignacionOptima2() {
+
+  List<dynamic> calcularAsignacionOptima2() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -609,11 +641,20 @@ class _MyhomeState extends State<Myhome> {
         .toList();
 
     List<int> asignacion = hungarianAlgorithm2(matrizAdyacenciaInt);
-    List<int> asignacionOptima =
-        List.generate(asignacion.length, (i) => asignacion[i] + 1);
-
-    return asignacionOptima;
+    List<List<String>> noms = [];
+    int sumatoria = 0;
+    for (int i = 1; i < matrizAdyacencia.length; i++) {
+      if (asignacion[i - 1] != -1) {
+        noms.add([
+          matrizAdyacencia[0][i],
+          matrizAdyacencia[0][asignacion[i - 1] + 1]
+        ]);
+        sumatoria += matrizAdyacenciaInt[i - 1][asignacion[i - 1]];
+      }
+    }
+    return [sumatoria, noms];
   }
+
 //Función eliminar lineas, llamada por la función _showDialogEliminar
   void eliminarLineas(ModeloNodo e) {
     //Recorre la lista de Lineas
@@ -675,8 +716,37 @@ class _MyhomeState extends State<Myhome> {
         });
   }
 
-  _showDialogDem(BuildContext context, int con) {
-    showDialog(
+  void showDialogSequence(BuildContext context, int con,
+      List<List<String>> matrizAdyacencia, List<String> of, List<String> dem,
+      {bool showOferta = false}) {
+    if (con < matrizAdyacencia.length) {
+      if (showOferta) {
+        _showDialogOf(context, con, matrizAdyacencia, of, dem).then((_) {
+          showDialogSequence(context, con + 1, matrizAdyacencia, of, dem,
+              showOferta: true);
+        });
+      } else {
+        _showDialogDem(context, con, matrizAdyacencia, of, dem).then((_) {
+          showDialogSequence(context, con + 1, matrizAdyacencia, of, dem);
+        });
+      }
+    } else if (!showOferta) {
+      showDialogSequence(context, 1, matrizAdyacencia, of, dem,
+          showOferta: true);
+    }
+  }
+
+  bool continueDialogs = true;
+
+  Future<void> _showDialogDem(
+      BuildContext context,
+      int con,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    if (!continueDialogs) return Future.value();
+
+    return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -697,25 +767,20 @@ class _MyhomeState extends State<Myhome> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    con++;
-                    setState(() {});
-                    List<List<String>> matrizAdyacencia = [];
-                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                    if (con < matrizAdyacencia.length) {
-                      _showDialogDem(context, con);
-                    }
+                  onPressed: () async {
                     dem.add(receptorMensaje.text);
-
                     receptorMensaje.clear();
                     Navigator.of(context).pop();
+                    if (con + 1 < matrizAdyacencia.length) {
+                      await _showDialogDem(
+                          context, con + 1, matrizAdyacencia, of, dem);
+                    }
                   },
                   child: Text("OK"),
                 ),
                 TextButton(
                   onPressed: () {
-                    setState(() {});
+                    continueDialogs = false;
                     Navigator.of(context).pop();
                   },
                   child: Text("Cancel"),
@@ -728,15 +793,24 @@ class _MyhomeState extends State<Myhome> {
     );
   }
 
-  _showDialogOf(BuildContext context, int con) {
-    showDialog(
+// ...
+
+  Future<void> _showDialogOf(
+      BuildContext context,
+      int con,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    if (!continueDialogs) return Future.value();
+
+    return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
-              title: Text("Ingrese demana " + con.toString()),
+              title: Text("Ingrese demanda " + con.toString()),
               content: Form(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -750,24 +824,20 @@ class _MyhomeState extends State<Myhome> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    con++;
-                    setState(() {});
-                    List<List<String>> matrizAdyacencia = [];
-                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                    if (con < matrizAdyacencia.length) {
-                      _showDialogOf(context, con);
-                    }
+                  onPressed: () async {
                     of.add(receptorMensaje.text);
-                    if (con == matrizAdyacencia.length) {
+                    receptorMensaje.clear();
+                    Navigator.of(context).pop();
+                    if (con + 1 < matrizAdyacencia.length) {
+                      await _showDialogOf(
+                          context, con + 1, matrizAdyacencia, of, dem);
+                    } else {
                       Norwest nor = Norwest();
                       var res = nor.calcNor(matrizAdyacencia, of, dem);
-                      receptorMensaje.clear();
-                      Navigator.of(context).pop();
                       // Navegar a la nueva página
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => matnor(res, matrizAdyacencia),
+                        builder: (context) =>
+                            matnor(res[1], matrizAdyacencia, res[0]),
                       ));
                     }
                   },
@@ -775,7 +845,7 @@ class _MyhomeState extends State<Myhome> {
                 ),
                 TextButton(
                   onPressed: () {
-                    setState(() {});
+                    continueDialogs = false;
                     Navigator.of(context).pop();
                   },
                   child: Text("Cancel"),
@@ -786,6 +856,104 @@ class _MyhomeState extends State<Myhome> {
         );
       },
     );
+  }
+
+  Future<void> _showDialogsDem(
+      BuildContext context,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    for (int con = 0; con < matrizAdyacencia.length - 1; con++) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          TextEditingController textFieldController = TextEditingController();
+          return AlertDialog(
+            title: Text("Ingrese oferta " + (con + 1).toString()),
+            content: Form(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: textFieldController,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  dem.add(textFieldController.text);
+                  textFieldController.clear();
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _showDialogsOf(
+      BuildContext context,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    for (int con = 0; con < matrizAdyacencia.length - 1; con++) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          TextEditingController textFieldController = TextEditingController();
+          return AlertDialog(
+            title: Text("Ingrese demanda " + (con + 1).toString()),
+            content: Form(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: textFieldController,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  of.add(textFieldController.text);
+                  textFieldController.clear();
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    Norwest nor = Norwest();
+    var res = nor.calcNor(matrizAdyacencia, of, dem);
+    // Navegar a la nueva página
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => matnor(res[1], matrizAdyacencia, res[0]),
+    ));
   }
 
   //Mensaje de alerta para la Unir dos nodos
@@ -1040,167 +1208,6 @@ class _MyhomeState extends State<Myhome> {
           );
         });
   }
- _Sobrescribir(BuildContext context, String cifraNodo, String cifraLinea) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text("GRAFO A SOBRESCRIBIR"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Seleccione:'),
-            Container(
-              color: Colors.blue,
-              height: 300,
-              width: 250,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('grafo').snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  return ListView(
-                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                      ModeloGrafo modelo = ModeloGrafo.fromMap(document.data() as Map<String, dynamic>, document.id);
-
-                      return Card(
-                        child: ListTile(
-                          title: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text('${modelo.id}'),
-                                    ],
-                                  ),
-                                ),
-                                VerticalDivider(),
-                                Expanded(
-                                  flex: 4,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SingleChildScrollView(
-                                        child: Text('${modelo.nombre}', overflow: TextOverflow.ellipsis,),
-                                        scrollDirection: Axis.horizontal,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text('Lineas: ${modelo.cantidadLineas}'),
-                                      Text('Nodos: ${modelo.cantidadNodos}'),
-                                      Text('Descripción:'),
-                                      Container(
-                                        height: 56,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.vertical,
-                                          child: Text('${modelo.descripcion}'),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          onTap: () async {
-                            setState(() {
-                              Navigator.of(context).pop();
-                            });
-
-                            await FirebaseFirestore.instance.collection('grafo').doc(modelo.id).update({
-                              'Nombre': tituloGuardado.text,
-                              'Descripcion': descripcionGuardada.text,
-                              'Nodos': cifraNodo,
-                              'Lineas': cifraLinea,
-                              'cantidadNodos': cantN,
-                              'cantidadLineas': cantL
-                            });
-
-                            // Limpiar los campos de texto después de guardar
-                            tituloGuardado.clear();
-                            descripcionGuardada.clear();
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.of(context).pop();
-            },
-            child: Text("OK"),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {});
-              Navigator.of(context).pop();
-            },
-            child: Text("Cancel"),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-  Future<void> createDocumentWithSequentialId(String nombre, String descripcion, String nodos, String lineas, int cantidadNodos, int cantidadLineas) async {
-  String cifraNodo = cifradoNodos();
-  String cifraLinea = cifradoLineas();
-  CollectionReference collection = FirebaseFirestore.instance.collection('grafo');
-
-  QuerySnapshot snapshot = await collection.orderBy(FieldPath.documentId).limitToLast(1).get();
-
-  int lastId = 0;
-  if (snapshot.docs.isNotEmpty) {
-    String lastDocId = snapshot.docs.first.id;
-    String lastSequentialId = lastDocId.replaceFirst('grafoid', '');
-    lastId = int.tryParse(lastSequentialId) ?? 0;
-  }
-
-  String nextId = 'grafoid${lastId + 1}';
-
-  await collection.doc(nextId).set({
-     'nombre': nombre,
-    'descripcion': descripcion,
-    'nodos': cifraNodo,
-    'lineas': cifraLinea,
-    'cantidadNodos': cantN,
-    'cantidadLineas': cantL,
-  });
-}
-Future<ModeloGrafo?> loadGraph(String documentId) async {
-  DocumentReference docRef = FirebaseFirestore.instance.collection('grafo').doc(documentId);
-  DocumentSnapshot docSnapshot = await docRef.get();
-
-  if (docSnapshot.exists) {
-    Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-    ModeloGrafo modeloCifrado = ModeloGrafo.fromJson(data);
-    return modeloCifrado;
-  } else {
-    print("Documento no encontrado");
-    return null;
-  }
-  
-}
-
 
   _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
   showDialog(
@@ -1374,36 +1381,8 @@ Future<ModeloGrafo?> loadGraph(String documentId) async {
       modeloGuardado = auxModelo;
     });
   }
-_confirmarCargado(BuildContext context, ModeloGrafo modelo) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text("CONFIRMACIÓN DE CARGA"),
-        content: Text("¿Está seguro de que desea cargar el grafo '${modelo.nombre}'?"),
-        actions: [
-          TextButton(
-              onPressed: () {
-                setState(() {
-                  descrifrado(modelo);
-                  Navigator.of(context).pop();
-                });
-              },
-              child: Text("OK")),
-          TextButton(
-              onPressed: () {
-                setState(() {
-                  Navigator.of(context).pop();
-                });
-              },
-              child: Text("Cancel")),
-        ],
-      );
-    },
-  );
-}
 
-_confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
+  _confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
   showDialog(
     context: context,
     builder: (context) {
@@ -1432,7 +1411,196 @@ _confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
   );
 }
 
+  _confirmarCargado(BuildContext context, ModeloGrafo modelo) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("CONFIRMACIÓN DE CARGA"),
+        content: Text("¿Está seguro de que desea cargar el grafo '${modelo.nombre}'?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  descrifrado(modelo);
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("OK")),
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text("Cancel")),
+        ],
+      );
+    },
+  );
+}
+
+  _Sobrescribir(BuildContext context, String cifraNodo, String cifraLinea) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("GRAFO A SOBRESCRIBIR"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Seleccione:'),
+            Container(
+              color: Colors.blue,
+              height: 300,
+              width: 250,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('grafo').snapshots(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+
+                  return ListView(
+                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                      ModeloGrafo modelo = ModeloGrafo.fromMap(document.data() as Map<String, dynamic>, document.id);
+
+                      return Card(
+                        child: ListTile(
+                          title: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('${modelo.id}'),
+                                    ],
+                                  ),
+                                ),
+                                VerticalDivider(),
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SingleChildScrollView(
+                                        child: Text('${modelo.nombre}', overflow: TextOverflow.ellipsis,),
+                                        scrollDirection: Axis.horizontal,
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text('Lineas: ${modelo.cantidadLineas}'),
+                                      Text('Nodos: ${modelo.cantidadNodos}'),
+                                      Text('Descripción:'),
+                                      Container(
+                                        height: 56,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: Text('${modelo.descripcion}'),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          onTap: () async {
+                            setState(() {
+                              Navigator.of(context).pop();
+                            });
+
+                            await FirebaseFirestore.instance.collection('grafo').doc(modelo.id).update({
+                              'Nombre': tituloGuardado.text,
+                              'Descripcion': descripcionGuardada.text,
+                              'Nodos': cifraNodo,
+                              'Lineas': cifraLinea,
+                              'cantidadNodos': cantN,
+                              'cantidadLineas': cantL
+                            });
+
+                            // Limpiar los campos de texto después de guardar
+                            tituloGuardado.clear();
+                            descripcionGuardada.clear();
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.of(context).pop();
+            },
+            child: Text("OK"),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {});
+              Navigator.of(context).pop();
+            },
+            child: Text("Cancel"),
+          ),
+        ],
+      );
+    },
+  );
+}
+ Future<void> createDocumentWithSequentialId(String nombre, String descripcion, String nodos, String lineas, int cantidadNodos, int cantidadLineas) async {
+  String cifraNodo = cifradoNodos();
+  String cifraLinea = cifradoLineas();
+  CollectionReference collection = FirebaseFirestore.instance.collection('grafo');
+
+  QuerySnapshot snapshot = await collection.orderBy(FieldPath.documentId).limitToLast(1).get();
+
+  int lastId = 0;
+  if (snapshot.docs.isNotEmpty) {
+    String lastDocId = snapshot.docs.first.id;
+    String lastSequentialId = lastDocId.replaceFirst('grafoid', '');
+    lastId = int.tryParse(lastSequentialId) ?? 0;
+  }
+
+  String nextId = 'grafoid${lastId + 1}';
+
+  await collection.doc(nextId).set({
+     'nombre': nombre,
+    'descripcion': descripcion,
+    'nodos': cifraNodo,
+    'lineas': cifraLinea,
+    'cantidadNodos': cantN,
+    'cantidadLineas': cantL,
+  });
+}
+Future<ModeloGrafo?> loadGraph(String documentId) async {
+  DocumentReference docRef = FirebaseFirestore.instance.collection('grafo').doc(documentId);
+  DocumentSnapshot docSnapshot = await docRef.get();
+
+  if (docSnapshot.exists) {
+    Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+    ModeloGrafo modeloCifrado = ModeloGrafo.fromJson(data);
+    return modeloCifrado;
+  } else {
+    print("Documento no encontrado");
+    return null;
+  }
   
+}
+
+
+
   String cifradoNodos() {
     String cifrado = "";
     vNodo.forEach((Nodo) {
@@ -1469,7 +1637,7 @@ _confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
     return cifrado;
   }
 
- void descrifrado(ModeloGrafo cifrado) {
+  void descrifrado(ModeloGrafo cifrado) {
   vNodo.clear();
   List<String> ListaNodos = cifrado.nodos.split(";");
   for (int i = 0; i < cifrado.cantidadNodos; i++) {
@@ -1502,4 +1670,56 @@ _confirmarEliminacion(BuildContext context, ModeloGrafo modelo) {
 //      MaterialPageRoute(builder: (context) => Help()),
 //    );
 //  }
+  creaJon() {
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    Johnson jon = Johnson();
+    int i = 1;
+    var aux = jon.calcJon(matrizAdyacencia);
+    llenalis(aux);
+    //estj=List<String>.from(aux);
+
+    if (comparaLis(aux, estj) == true) {
+      estadoj = !estadoj;
+    } else {
+      estadoj = true;
+    }
+
+    if (estadoj == true) {
+      vLineas.forEach((linea) {
+        if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
+          linea.tipo = 5;
+          i++;
+        }
+      });
+    } else {
+      vLineas.forEach((linea) {
+        linea.tipo = 1;
+      });
+    }
+  }
+
+  llenalis(List<String> l) {
+    estj.clear();
+    for (int i = 0; i < l.length; i++) {
+      estj.add(l[i]);
+    }
+  }
+
+  bool comparaLis(List<String> l1, List<String> l2) {
+    int t1 = l1.length;
+    int t2 = l2.length;
+    int s = 0;
+    if (t1 == t2) {
+      for (int i = 0; i < t1; i++) {
+        if (identical(l1[i], l2[i])) {
+          s++;
+        }
+      }
+    }
+    if (s == t1) {
+      return true;
+    }
+    return false;
+  }
 }
