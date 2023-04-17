@@ -792,8 +792,6 @@ class _MyhomeState extends State<Myhome> {
     );
   }
 
-// ...
-
   Future<void> _showDialogOf(
       BuildContext context,
       int con,
