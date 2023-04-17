@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:grafos/johnson.dart';
 import 'package:grafos/norwest.dart';
@@ -10,8 +11,9 @@ import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
 import 'norwest.dart';
 import 'matnor.dart';
+import 'dart:io';
 import 'asignacion2.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -34,8 +36,8 @@ class _MyhomeState extends State<Myhome> {
   int modo = -1;
   //Variable que cuenta la cantidad de nodos
   int contadorNodos = 1;
-  List<String> estj = [];
   bool estadoj = false;
+  List<String> estj = [];
   /*
   *  Variables que almacenan la posición donde se hace un toque
   * (x,y) variables que detectan el toque
@@ -75,7 +77,10 @@ class _MyhomeState extends State<Myhome> {
 
   @override
   void initState() {
-    cargaModelo();
+    if (!kIsWeb && !Platform.isWindows) {
+      cargaModelo();
+    }
+
     super.initState();
   }
 
@@ -378,10 +383,8 @@ class _MyhomeState extends State<Myhome> {
               mini: true,
               heroTag: "asignacion",
               onPressed: () {
-                List<List<String>> asignacionOptimaMin =
-                    calcularAsignacionOptima();
-                List<List<String>> asignacionOptimaMax =
-                    calcularAsignacionOptima2();
+                List<dynamic> asignacionOptimaMin = calcularAsignacionOptima();
+                List<dynamic> asignacionOptimaMax = calcularAsignacionOptima2();
                 print(asignacionOptimaMin);
                 showDialog(
                   context: context,
@@ -394,22 +397,27 @@ class _MyhomeState extends State<Myhome> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Minimización:"),
-                            ...asignacionOptimaMin
+                            ...asignacionOptimaMin[1]
                                 .asMap()
                                 .entries
                                 .map((entry) => Text(
                                     "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                 .toList(),
+                            SizedBox(height: 16),
+                            Text("Sumatoria: ${asignacionOptimaMin[0]}"),
+
                             SizedBox(
                                 height:
                                     16), // Agregar espacio entre los resultados
                             Text("Maximización:"),
-                            ...asignacionOptimaMax
+                            ...asignacionOptimaMax[1]
                                 .asMap()
                                 .entries
                                 .map((entry) => Text(
                                     "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                 .toList(),
+                            SizedBox(height: 16),
+                            Text("Sumatoria: ${asignacionOptimaMax[0]}"),
                           ],
                         ),
                       ),
@@ -434,18 +442,17 @@ class _MyhomeState extends State<Myhome> {
             FloatingActionButton(
               mini: true,
               heroTag: "norwest",
-              onPressed: () {
+              onPressed: () async {
                 of = [];
                 dem = [];
 
                 List<List<String>> matrizAdyacencia = [];
-
                 matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                _showDialogOf(context, 1);
-                _showDialogDem(context, 1);
-
-                //for (int i = 0; i < matrizAdyacencia.length; i++) {
+                continueDialogs = true;
+                //showDialogSequence(context, 1, matrizAdyacencia, of, dem);
+                await _showDialogsDem(context, matrizAdyacencia, of, dem);
+                await _showDialogsOf(context, matrizAdyacencia, of, dem);
+                //for  (int i = 0; i < matrizAdyacencia.length; i++) {
                 //  _showDialogDem(context, i - 1);
                 //}
 
@@ -594,7 +601,7 @@ class _MyhomeState extends State<Myhome> {
     return matrizAdyacencia;
   }
 
-  List<List<String>> calcularAsignacionOptima() {
+  List<dynamic> calcularAsignacionOptima() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -608,18 +615,20 @@ class _MyhomeState extends State<Myhome> {
     List<int> asignacion = hungarianAlgorithm(matrizAdyacenciaInt);
 
     List<List<String>> noms = [];
+    int sumatoria = 0;
     for (int i = 1; i < matrizAdyacencia.length; i++) {
       if (asignacion[i - 1] != -1) {
         noms.add([
           matrizAdyacencia[0][i],
           matrizAdyacencia[0][asignacion[i - 1] + 1]
         ]);
+        sumatoria += matrizAdyacenciaInt[i - 1][asignacion[i - 1]];
       }
     }
-    return noms;
+    return [sumatoria, noms];
   }
 
-  List<List<String>> calcularAsignacionOptima2() {
+  List<dynamic> calcularAsignacionOptima2() {
     List<List<String>> matrizAdyacencia = [];
 
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
@@ -632,15 +641,17 @@ class _MyhomeState extends State<Myhome> {
 
     List<int> asignacion = hungarianAlgorithm2(matrizAdyacenciaInt);
     List<List<String>> noms = [];
+    int sumatoria = 0;
     for (int i = 1; i < matrizAdyacencia.length; i++) {
       if (asignacion[i - 1] != -1) {
         noms.add([
           matrizAdyacencia[0][i],
           matrizAdyacencia[0][asignacion[i - 1] + 1]
         ]);
+        sumatoria += matrizAdyacenciaInt[i - 1][asignacion[i - 1]];
       }
     }
-    return noms;
+    return [sumatoria, noms];
   }
 
 //Función eliminar lineas, llamada por la función _showDialogEliminar
@@ -704,8 +715,37 @@ class _MyhomeState extends State<Myhome> {
         });
   }
 
-  _showDialogDem(BuildContext context, int con) {
-    showDialog(
+  void showDialogSequence(BuildContext context, int con,
+      List<List<String>> matrizAdyacencia, List<String> of, List<String> dem,
+      {bool showOferta = false}) {
+    if (con < matrizAdyacencia.length) {
+      if (showOferta) {
+        _showDialogOf(context, con, matrizAdyacencia, of, dem).then((_) {
+          showDialogSequence(context, con + 1, matrizAdyacencia, of, dem,
+              showOferta: true);
+        });
+      } else {
+        _showDialogDem(context, con, matrizAdyacencia, of, dem).then((_) {
+          showDialogSequence(context, con + 1, matrizAdyacencia, of, dem);
+        });
+      }
+    } else if (!showOferta) {
+      showDialogSequence(context, 1, matrizAdyacencia, of, dem,
+          showOferta: true);
+    }
+  }
+
+  bool continueDialogs = true;
+
+  Future<void> _showDialogDem(
+      BuildContext context,
+      int con,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    if (!continueDialogs) return Future.value();
+
+    return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -726,25 +766,20 @@ class _MyhomeState extends State<Myhome> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    con++;
-                    setState(() {});
-                    List<List<String>> matrizAdyacencia = [];
-                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                    if (con < matrizAdyacencia.length) {
-                      _showDialogDem(context, con);
-                    }
+                  onPressed: () async {
                     dem.add(receptorMensaje.text);
-
                     receptorMensaje.clear();
                     Navigator.of(context).pop();
+                    if (con + 1 < matrizAdyacencia.length) {
+                      await _showDialogDem(
+                          context, con + 1, matrizAdyacencia, of, dem);
+                    }
                   },
                   child: Text("OK"),
                 ),
                 TextButton(
                   onPressed: () {
-                    setState(() {});
+                    continueDialogs = false;
                     Navigator.of(context).pop();
                   },
                   child: Text("Cancel"),
@@ -757,15 +792,24 @@ class _MyhomeState extends State<Myhome> {
     );
   }
 
-  _showDialogOf(BuildContext context, int con) {
-    showDialog(
+// ...
+
+  Future<void> _showDialogOf(
+      BuildContext context,
+      int con,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    if (!continueDialogs) return Future.value();
+
+    return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
-              title: Text("Ingrese demana " + con.toString()),
+              title: Text("Ingrese demanda " + con.toString()),
               content: Form(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -779,24 +823,20 @@ class _MyhomeState extends State<Myhome> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    con++;
-                    setState(() {});
-                    List<List<String>> matrizAdyacencia = [];
-                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
-
-                    if (con < matrizAdyacencia.length) {
-                      _showDialogOf(context, con);
-                    }
+                  onPressed: () async {
                     of.add(receptorMensaje.text);
-                    if (con == matrizAdyacencia.length) {
+                    receptorMensaje.clear();
+                    Navigator.of(context).pop();
+                    if (con + 1 < matrizAdyacencia.length) {
+                      await _showDialogOf(
+                          context, con + 1, matrizAdyacencia, of, dem);
+                    } else {
                       Norwest nor = Norwest();
                       var res = nor.calcNor(matrizAdyacencia, of, dem);
-                      receptorMensaje.clear();
-                      Navigator.of(context).pop();
                       // Navegar a la nueva página
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => matnor(res, matrizAdyacencia),
+                        builder: (context) =>
+                            matnor(res[1], matrizAdyacencia, res[0]),
                       ));
                     }
                   },
@@ -804,7 +844,7 @@ class _MyhomeState extends State<Myhome> {
                 ),
                 TextButton(
                   onPressed: () {
-                    setState(() {});
+                    continueDialogs = false;
                     Navigator.of(context).pop();
                   },
                   child: Text("Cancel"),
@@ -815,6 +855,104 @@ class _MyhomeState extends State<Myhome> {
         );
       },
     );
+  }
+
+  Future<void> _showDialogsDem(
+      BuildContext context,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    for (int con = 0; con < matrizAdyacencia.length - 1; con++) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          TextEditingController textFieldController = TextEditingController();
+          return AlertDialog(
+            title: Text("Ingrese oferta " + (con + 1).toString()),
+            content: Form(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: textFieldController,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  dem.add(textFieldController.text);
+                  textFieldController.clear();
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _showDialogsOf(
+      BuildContext context,
+      List<List<String>> matrizAdyacencia,
+      List<String> of,
+      List<String> dem) async {
+    for (int con = 0; con < matrizAdyacencia.length - 1; con++) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          TextEditingController textFieldController = TextEditingController();
+          return AlertDialog(
+            title: Text("Ingrese demanda " + (con + 1).toString()),
+            content: Form(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    controller: textFieldController,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  of.add(textFieldController.text);
+                  textFieldController.clear();
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    Norwest nor = Norwest();
+    var res = nor.calcNor(matrizAdyacencia, of, dem);
+    // Navegar a la nueva página
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => matnor(res[1], matrizAdyacencia, res[0]),
+    ));
   }
 
   //Mensaje de alerta para la Unir dos nodos
@@ -1070,112 +1208,6 @@ class _MyhomeState extends State<Myhome> {
         });
   }
 
-  _Sobrescribir(context, String cifraNodo, String cifraLinea) {
-    showDialog(
-        context: context,
-        //El mensaje no se puede saltear
-        builder: (context) {
-          return AlertDialog(
-            //titulo del mensaje
-            title: Text("GRAFO A SOBRESCRIBIR"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Seleccione:'),
-                Container(
-                  color: Colors.blue,
-                  height: 300,
-                  width: 250,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: modeloGuardado.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: ListTile(
-                            title: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SingleChildScrollView(
-                                      child: Text(
-                                        '${modeloGuardado[index].Nombre}',
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      scrollDirection: Axis.horizontal,
-                                    ),
-                                    Text(
-                                        'Lineas: ${modeloGuardado[index].cantidadLineas}'),
-                                    Text(
-                                        'Nodos: ${modeloGuardado[index].cantidadNodos}'),
-                                    Text('Descripción:'),
-                                    Container(
-                                      height: 56,
-                                      width: 150,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: Text(
-                                            '${modeloGuardado[index].Descripcion}'),
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                            onTap: () {
-                              setState(() {
-                                DB.delete(modeloGuardado[index]);
-                                cargaModelo();
-                                Navigator.of(context).pop();
-                                ID = index + 1;
-                                DB.insert(modelo(
-                                    ID,
-                                    tituloGuardado.text,
-                                    descripcionGuardada.text,
-                                    cifraNodo,
-                                    cifraLinea,
-                                    cantN,
-                                    cantL));
-                                cargaModelo();
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              //Confirma el guardado
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK")),
-              //cancela el cambio
-              TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel")),
-            ],
-          );
-        });
-  }
-
   _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
     showDialog(
         context: context,
@@ -1415,6 +1447,112 @@ class _MyhomeState extends State<Myhome> {
         });
   }
 
+  _Sobrescribir(context, String cifraNodo, String cifraLinea) {
+    showDialog(
+        context: context,
+        //El mensaje no se puede saltear
+        builder: (context) {
+          return AlertDialog(
+            //titulo del mensaje
+            title: Text("GRAFO A SOBRESCRIBIR"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Seleccione:'),
+                Container(
+                  color: Colors.blue,
+                  height: 300,
+                  width: 250,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: modeloGuardado.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            title: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('${modeloGuardado[index].id}'),
+                                VerticalDivider(),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Text(
+                                        '${modeloGuardado[index].Nombre}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      scrollDirection: Axis.horizontal,
+                                    ),
+                                    Text(
+                                        'Lineas: ${modeloGuardado[index].cantidadLineas}'),
+                                    Text(
+                                        'Nodos: ${modeloGuardado[index].cantidadNodos}'),
+                                    Text('Descripción:'),
+                                    Container(
+                                      height: 56,
+                                      width: 150,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Text(
+                                            '${modeloGuardado[index].Descripcion}'),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            onTap: () {
+                              setState(() {
+                                DB.delete(modeloGuardado[index]);
+                                cargaModelo();
+                                Navigator.of(context).pop();
+                                ID = index + 1;
+                                DB.insert(modelo(
+                                    ID,
+                                    tituloGuardado.text,
+                                    descripcionGuardada.text,
+                                    cifraNodo,
+                                    cifraLinea,
+                                    cantN,
+                                    cantL));
+                                cargaModelo();
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              //Confirma el guardado
+              TextButton(
+                  onPressed: () {
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK")),
+              //cancela el cambio
+              TextButton(
+                  onPressed: () {
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel")),
+            ],
+          );
+        });
+  }
+
   String cifradoNodos() {
     String cifrado = "";
     vNodo.forEach((Nodo) {
@@ -1492,7 +1630,7 @@ class _MyhomeState extends State<Myhome> {
     var aux = jon.calcJon(matrizAdyacencia);
     llenalis(aux);
     //estj=List<String>.from(aux);
-    print(comparaLis(aux, estj));
+
     if (comparaLis(aux, estj) == true) {
       estadoj = !estadoj;
     } else {
