@@ -9,13 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cloud_firestore: ^4.5.1
-  firebase_core: ^2.9.0
-  firebase_storage: ^11.1.0
   sqflite: ^2.2.5
   flutter_speed_dial: ^6.2.0
-  drift: ^2.7.0
-  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:
