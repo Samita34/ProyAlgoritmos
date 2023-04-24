@@ -1633,7 +1633,7 @@ class _MyhomeState extends State<Myhome> {
     Johnson jon = Johnson();
     int i = 1;
     var aux = jon.calcJon(matrizAdyacencia)[0];
-    //print(jon.calcJon(matrizAdyacencia)[0]);
+
     llenalis(aux);
     //estj=List<String>.from(aux);
 
