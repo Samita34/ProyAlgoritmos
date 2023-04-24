@@ -11,7 +11,6 @@ class Norwest {
     //  ["d", "0", "0", "0", "0"],
     //];
     int n = mat.length;
-
     int s = 0;
     List<int> esq = [1, 1];
     List<List<String>> aux =

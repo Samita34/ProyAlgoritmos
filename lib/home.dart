@@ -565,6 +565,12 @@ class _MyhomeState extends State<Myhome> {
     );
   }
 
+  List<String> sortList(List<String> a) {
+    List<String> ls = [...a];
+    ls.sort();
+    return ls;
+  }
+
   List<List<String>> generaMatriz(List<List<String>> matrizAdyacencia) {
     matrizAdyacencia.clear();
     List<String> v2 = [];
@@ -572,6 +578,7 @@ class _MyhomeState extends State<Myhome> {
     vNodo.forEach((ele) {
       v2.add((ele.nombre));
     });
+    v2 = sortList(v2);
     matrizAdyacencia.add(v2);
     for (int i = 0; i < vNodo.length; i++) {
       List<String> v = [];
@@ -583,21 +590,21 @@ class _MyhomeState extends State<Myhome> {
       }
       matrizAdyacencia.add(v);
     }
-    vLineas.forEach((linea) {
-      int f = int.parse(linea.Ni.codigo);
-      int c = int.parse(linea.Nf.codigo);
-      int valorLinea = int.parse(linea.valor);
-      if (linea.tipo == 0) {
+
+    for (int i = 0; i < vLineas.length; i++) {
+      int f = v2.indexOf(vLineas[i].Ni.nombre);
+      int c = v2.indexOf(vLineas[i].Nf.nombre);
+      int valorLinea = int.parse(vLineas[i].valor);
+      if (vLineas[i].tipo == 0) {
         List<String> fila = [...matrizAdyacencia[c]];
         fila[f] = valorLinea.toString();
         matrizAdyacencia[c] = fila;
-
-        print(fila);
       }
       List<String> fila = [...matrizAdyacencia[f]];
       fila[c] = valorLinea.toString();
       matrizAdyacencia[f] = fila;
-    });
+    }
+
     return matrizAdyacencia;
   }
 
@@ -1625,7 +1632,8 @@ class _MyhomeState extends State<Myhome> {
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Johnson jon = Johnson();
     int i = 1;
-    var aux = jon.calcJon(matrizAdyacencia);
+    var aux = jon.calcJon(matrizAdyacencia)[0];
+    //print(jon.calcJon(matrizAdyacencia)[0]);
     llenalis(aux);
     //estj=List<String>.from(aux);
 
@@ -1636,12 +1644,13 @@ class _MyhomeState extends State<Myhome> {
     }
 
     if (estadoj == true) {
-      vLineas.forEach((linea) {
-        if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
-          linea.tipo = 5;
-          i++;
-        }
-      });
+      while (i < aux.length)
+        vLineas.forEach((linea) {
+          if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
+            linea.tipo = 5;
+            i++;
+          }
+        });
     } else {
       vLineas.forEach((linea) {
         linea.tipo = 1;
