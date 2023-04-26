@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +17,7 @@ import 'matnor.dart';
 import 'dart:io';
 import 'asignacion2.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
+import 'mergesort.dart';
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
 
@@ -35,6 +37,11 @@ class _MyhomeState extends State<Myhome> {
   * Modo=4 : Mover Nodo
   * */
   int modo = -1;
+  final Random rng = Random();
+
+  List<int> _generarArrayAleatorio(int cantidad) {
+    return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+  }
   //Variable que cuenta la cantidad de nodos
   int contadorNodos = 1;
   bool estadoj = false;
@@ -439,6 +446,19 @@ class _MyhomeState extends State<Myhome> {
                 size: 40,
               ),
             ),
+            FloatingActionButton(
+        mini: true,
+        heroTag: "mergeSort",
+        onPressed: () => onMergeSortButtonPressed(context),
+        child: const Icon(
+          Icons.sort,
+          size: 40,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+      ),
+    
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
@@ -467,6 +487,8 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
+          
+            
             Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
@@ -1721,5 +1743,14 @@ Future<ModeloGrafo?> loadGraph(String documentId) async {
       return true;
     }
     return false;
+  }
+   Future<void> onMergeSortButtonPressed(BuildContext context) async {
+    List<int> arr = _generarArrayAleatorio(10);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MergeSortScreen(),
+      ),
+    );
   }
 }
