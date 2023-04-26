@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -14,6 +16,7 @@ import 'norwest.dart';
 import 'matnor.dart';
 import 'dart:io';
 import 'asignacion2.dart';
+import 'mergesort.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
@@ -39,6 +42,12 @@ class _MyhomeState extends State<Myhome> {
   int contadorNodos = 1;
   bool estadoj = false;
   List<String> estj = [];
+ final Random rng = Random();
+
+  List<int> _generarArrayAleatorio(int cantidad) {
+    return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+  }
+
   /*
   *  Variables que almacenan la posición donde se hace un toque
   * (x,y) variables que detectan el toque
@@ -467,6 +476,21 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
+              FloatingActionButton(
+        mini: true,
+        heroTag: "mergeSort",
+        onPressed: () => onMergeSortButtonPressed(context),
+        child: const Icon(
+          Icons.sort,
+          size: 40,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+      ),
+
+
+
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
@@ -1723,5 +1747,15 @@ class _MyhomeState extends State<Myhome> {
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Selection selec = Selection();
     return selec.selection(matrizAdyacencia);
+  }
+
+  Future<void> onMergeSortButtonPressed(BuildContext context) async {
+    List<int> arr = _generarArrayAleatorio(10);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MergeSortScreen(),
+      ),
+    );
   }
 }
