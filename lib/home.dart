@@ -5,6 +5,7 @@ import 'package:grafos/johnson.dart';
 import 'package:grafos/norwest.dart';
 import 'modelos.dart';
 import 'figura.dart';
+import 'selection.dart';
 //import 'help.dart';
 import 'matriz.dart';
 import 'hungarian_algorithm.dart';
@@ -464,6 +465,48 @@ class _MyhomeState extends State<Myhome> {
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "selection",
+              onPressed: () {
+                List<int> aux = selectionSort();
+                String qwq = "";
+                for (int i = 0; i < aux.length; i++) {
+                  qwq += aux[i].toString() + " ";
+                }
+
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Ordenamiento Selection Sort"),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("$qwq"),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Aceptar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: const Icon(
+                Icons.add_road,
+                size: 40,
               ),
             ),
             Expanded(child: Container()),
@@ -1673,5 +1716,12 @@ class _MyhomeState extends State<Myhome> {
       return true;
     }
     return false;
+  }
+
+  selectionSort() {
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    Selection selec = Selection();
+    return selec.selection(matrizAdyacencia);
   }
 }
