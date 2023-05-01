@@ -17,6 +17,7 @@ import 'matnor.dart';
 import 'dart:io';
 import 'asignacion2.dart';
 import 'mergesort.dart';
+import 'insertionsort.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
@@ -128,7 +129,7 @@ class _MyhomeState extends State<Myhome> {
                 child: ListTile(
                   title: Text('Insertion sort',style: TextStyle(fontSize: 20),),
                   onTap: (){
-                    //Funcion Insertion sort;
+                    builder: (context) => InsertScreen(),
                   },
                 ),
               ),
