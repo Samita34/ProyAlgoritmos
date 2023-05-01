@@ -100,6 +100,75 @@ class _MyhomeState extends State<Myhome> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        drawer: Drawer(
+          backgroundColor: Color(0xFF2D2D34),
+          child: ListView(
+          children: [
+              Container(padding: EdgeInsets.all(35)),
+              Ink(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(50)
+                ),
+                child: ListTile(
+                  title: Text('Selection sort',style: TextStyle(fontSize: 20),),
+                  onTap: (){
+                    //Funcion Selection sort;
+                  },
+                ),
+              ),
+              Container(padding: EdgeInsets.all(10)),
+              Ink(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                  border: Border.all(width: 2),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: ListTile(
+                  title: Text('Insertion sort',style: TextStyle(fontSize: 20),),
+                  onTap: (){
+                    //Funcion Insertion sort;
+                  },
+                ),
+              ),
+              Container(padding: EdgeInsets.all(10)),
+              Ink(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(50)
+                ),
+                child: ListTile(
+                  title: Text('Shell sort',style: TextStyle(fontSize: 20),),
+                  onTap: (){
+                    //Funcion shell sort;
+                  },
+                ),
+              ),
+              Container(padding: EdgeInsets.all(10)),
+              Ink(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(50)
+                ),
+                child: ListTile(
+                  title: Text('Merge sort',style: TextStyle(fontSize: 20),),
+                  onTap: (){
+                    onMergeSortButtonPressed(context);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(20),
+          child:AppBar(
+            backgroundColor: Color(0xFF2D2D34),
+          ),
+        ),
         //backgroundColor: Color.fromARGB(255, 168, 255, 251),
         backgroundColor: Color(0xFF2D2D34),
         //Pila que almacena todos los objetos
@@ -476,18 +545,6 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
-              FloatingActionButton(
-        mini: true,
-        heroTag: "mergeSort",
-        onPressed: () => onMergeSortButtonPressed(context),
-        child: const Icon(
-          Icons.sort,
-          size: 40,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-      ),
 
 
 
