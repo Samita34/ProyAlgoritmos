@@ -129,7 +129,12 @@ class _MyhomeState extends State<Myhome> {
                 child: ListTile(
                   title: Text('Insertion sort',style: TextStyle(fontSize: 20),),
                   onTap: (){
-                    builder: (context) => InsertScreen();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MergeSortScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
