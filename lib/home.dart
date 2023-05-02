@@ -115,7 +115,12 @@ class _MyhomeState extends State<Myhome> {
                 child: ListTile(
                   title: Text('Selection sort',style: TextStyle(fontSize: 20),),
                   onTap: (){
-                    //Funcion Selection sort;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SelectionSortScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -553,7 +558,7 @@ class _MyhomeState extends State<Myhome> {
             ),
 
 
-
+            /*
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
@@ -596,6 +601,7 @@ class _MyhomeState extends State<Myhome> {
                 size: 40,
               ),
             ),
+            */
             Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
@@ -1805,12 +1811,14 @@ class _MyhomeState extends State<Myhome> {
     return false;
   }
 
+/*
   selectionSort() {
     List<List<String>> matrizAdyacencia = [];
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Selection selec = Selection();
     return selec.selection(matrizAdyacencia);
   }
+*/
 
   Future<void> onMergeSortButtonPressed(BuildContext context) async {
     List<int> arr = _generarArrayAleatorio(10);
