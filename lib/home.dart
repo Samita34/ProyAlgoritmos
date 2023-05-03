@@ -43,7 +43,7 @@ class _MyhomeState extends State<Myhome> {
   int contadorNodos = 1;
   bool estadoj = false;
   List<String> estj = [];
- final Random rng = Random();
+  final Random rng = Random();
 
   List<int> _generarArrayAleatorio(int cantidad) {
     return List<int>.generate(cantidad, (i) => rng.nextInt(100));
@@ -104,17 +104,25 @@ class _MyhomeState extends State<Myhome> {
         drawer: Drawer(
           backgroundColor: Color(0xFF2D2D34),
           child: ListView(
-          children: [
+            children: [
               Container(padding: EdgeInsets.all(35)),
               Ink(
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    gradient: LinearGradient(colors: [
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade900
+                    ]),
                     border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)
-                ),
+                    borderRadius: BorderRadius.circular(50)),
                 child: ListTile(
-                  title: Text('Selection sort',style: TextStyle(fontSize: 20),),
-                  onTap: (){
+                  title: Text(
+                    'Selection sort',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -127,13 +135,22 @@ class _MyhomeState extends State<Myhome> {
               Container(padding: EdgeInsets.all(10)),
               Ink(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                  gradient: LinearGradient(colors: [
+                    Colors.teal.shade50,
+                    Colors.teal.shade50,
+                    Colors.teal.shade50,
+                    Colors.teal.shade50,
+                    Colors.teal.shade900
+                  ]),
                   border: Border.all(width: 2),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: ListTile(
-                  title: Text('Insertion sort',style: TextStyle(fontSize: 20),),
-                  onTap: (){
+                  title: Text(
+                    'Insertion sort',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -146,13 +163,21 @@ class _MyhomeState extends State<Myhome> {
               Container(padding: EdgeInsets.all(10)),
               Ink(
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    gradient: LinearGradient(colors: [
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade900
+                    ]),
                     border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)
-                ),
+                    borderRadius: BorderRadius.circular(50)),
                 child: ListTile(
-                  title: Text('Shell sort',style: TextStyle(fontSize: 20),),
-                  onTap: (){
+                  title: Text(
+                    'Shell sort',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onTap: () {
                     //Funcion shell sort;
                   },
                 ),
@@ -160,13 +185,21 @@ class _MyhomeState extends State<Myhome> {
               Container(padding: EdgeInsets.all(10)),
               Ink(
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade50,Colors.teal.shade900]),
+                    gradient: LinearGradient(colors: [
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade50,
+                      Colors.teal.shade900
+                    ]),
                     border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)
-                ),
+                    borderRadius: BorderRadius.circular(50)),
                 child: ListTile(
-                  title: Text('Merge sort',style: TextStyle(fontSize: 20),),
-                  onTap: (){
+                  title: Text(
+                    'Merge sort',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  onTap: () {
                     onMergeSortButtonPressed(context);
                   },
                 ),
@@ -176,7 +209,7 @@ class _MyhomeState extends State<Myhome> {
         ),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(20),
-          child:AppBar(
+          child: AppBar(
             backgroundColor: Color(0xFF2D2D34),
           ),
         ),
@@ -556,7 +589,6 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
-
 
             /*
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
@@ -1146,9 +1178,10 @@ class _MyhomeState extends State<Myhome> {
                       ModeloLinea h;
                       if (nodoAux == e) {
                         tipo = -1;
-                        h = ModeloLinea(e, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(e, e, receptorMensaje.text, tipo, "");
                       } else {
-                        h = ModeloLinea(nodoAux, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(
+                            nodoAux, e, receptorMensaje.text, tipo, "");
                       }
                       //Añade esa linea a la lista
                       vLineas.add(h);
@@ -1748,7 +1781,7 @@ class _MyhomeState extends State<Myhome> {
           Nff = Nodo;
         }
       });
-      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
+      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3]), ""));
     }
   }
 
