@@ -91,14 +91,20 @@ class ModeloLinea {
   int _tipo;
 
   //valor
-  String _valor;
+  String _valor, _holg;
   //constructor
-  ModeloLinea(this._Ni, this._Nf, this._valor, this._tipo);
+  ModeloLinea(this._Ni, this._Nf, this._valor, this._tipo, this._holg);
   //getters and setters
   String get valor => _valor;
 
   set valor(String value) {
     _valor = value;
+  }
+
+  String get holg => _holg;
+
+  set holg(String value) {
+    _holg = value;
   }
 
   ModeloNodo get Nf => _Nf;

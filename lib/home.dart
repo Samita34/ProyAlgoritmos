@@ -1015,9 +1015,10 @@ class _MyhomeState extends State<Myhome> {
                       ModeloLinea h;
                       if (nodoAux == e) {
                         tipo = -1;
-                        h = ModeloLinea(e, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(e, e, receptorMensaje.text, tipo, "");
                       } else {
-                        h = ModeloLinea(nodoAux, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(
+                            nodoAux, e, receptorMensaje.text, tipo, "");
                       }
                       //Añade esa linea a la lista
                       vLineas.add(h);
@@ -1617,7 +1618,7 @@ class _MyhomeState extends State<Myhome> {
           Nff = Nodo;
         }
       });
-      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
+      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3]), ""));
     }
   }
 
@@ -1632,10 +1633,15 @@ class _MyhomeState extends State<Myhome> {
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Johnson jon = Johnson();
     int i = 1;
-    var aux = jon.calcJon(matrizAdyacencia)[0];
+    var jonson = jon.calcJon(matrizAdyacencia);
+    var aux = jonson[0];
+
+    List<int> vals = jon.mays(matrizAdyacencia);
+
+    List<int> valsn = jon.mins(matrizAdyacencia, jonson[1]);
 
     llenalis(aux);
-    //estj=List<String>.from(aux);
+    var holgs = jon.sacaHolg(matrizAdyacencia, aux, jonson[1], vals, valsn);
 
     if (comparaLis(aux, estj) == true) {
       estadoj = !estadoj;
@@ -1644,14 +1650,36 @@ class _MyhomeState extends State<Myhome> {
     }
 
     if (estadoj == true) {
-      while (i < aux.length)
+      for (int i = 0; i < holgs.length; i++) {
+        for (int j = 0; j < holgs.length; j++) {
+          vLineas.forEach((linea) {
+            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
+                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
+              linea.holg = "h: " + holgs[i][j];
+            }
+          });
+        }
+      }
+
+      while (i < aux.length) {
         vLineas.forEach((linea) {
           if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
             linea.tipo = 5;
             i++;
           }
         });
+      }
     } else {
+      for (int i = 0; i < holgs.length; i++) {
+        for (int j = 0; j < holgs.length; j++) {
+          vLineas.forEach((linea) {
+            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
+                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
+              linea.holg = "";
+            }
+          });
+        }
+      }
       vLineas.forEach((linea) {
         linea.tipo = 1;
       });

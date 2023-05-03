@@ -81,6 +81,19 @@ class Lineas extends CustomPainter {
     tp.paint(canvas, Offset(x, y));
   }
 
+  _holg(double x, double y, String msg, Canvas canvas) {
+    TextSpan span = TextSpan(
+        style: TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        text: msg);
+    TextPainter tp = TextPainter(
+        text: span,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr);
+    tp.layout();
+    tp.paint(canvas, Offset(x, y));
+  }
+
   _msg2(double x, double y, String msg, Canvas canvas) {
     TextSpan span = TextSpan(
         style: TextStyle(
@@ -143,6 +156,8 @@ class Lineas extends CustomPainter {
         canvas.drawPath(path, headPaint);
 
         _msg((xi + xf) / 2, (yi + yf) / 2, e.valor.toString(), canvas);
+        _holg(
+            (xi + xf - 100) / 2, (yi + yf - 50) / 2, e.holg.toString(), canvas);
       } else if (e.tipo == 5) {
         final double arrowLenght = 25;
         final double dx = e.Nf.x - e.Ni.x;
@@ -174,6 +189,8 @@ class Lineas extends CustomPainter {
         canvas.drawPath(path, headPaint);
 
         _msg((xi + xf) / 2, (yi + yf) / 2, e.valor.toString(), canvas);
+        _holg(
+            (xi + xf - 100) / 2, (yi + yf - 50) / 2, e.holg.toString(), canvas);
       } else {
         final double radio = 35;
         final double anguloFlecha = math.pi / 5;
