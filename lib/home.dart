@@ -18,6 +18,7 @@ import 'dart:io';
 import 'asignacion2.dart';
 import 'mergesort.dart';
 import 'insertionsort.dart';
+import 'shellsort.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
@@ -178,7 +179,12 @@ class _MyhomeState extends State<Myhome> {
                     style: TextStyle(fontSize: 20),
                   ),
                   onTap: () {
-                    //Funcion shell sort;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShellSortScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -1886,6 +1892,15 @@ class _MyhomeState extends State<Myhome> {
       context,
       MaterialPageRoute(
         builder: (context) => MergeSortScreen(),
+      ),
+    );
+  }
+  Future<void> onShellSortButtonPressed(BuildContext context) async {
+    List<int> arr = _generarArrayAleatorio(10);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ShellSortScreen(),
       ),
     );
   }
