@@ -477,6 +477,18 @@ class _MyhomeState extends State<Myhome> {
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
+            FloatingActionButton(
+              mini: true,
+              heroTag: "mergeSort",
+              onPressed: () => onMergeSortButtonPressed(context),
+              child: const Icon(
+                Icons.sort,
+                size: 40,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
