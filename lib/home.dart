@@ -155,7 +155,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MergeSortScreen(),
+                        builder: (context) => InsertionSortScreen(),
                       ),
                     );
                   },

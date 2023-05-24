@@ -1,65 +1,72 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
-class InsertScreen extends StatefulWidget {
-  @override
-  _InsertScreenState createState() => _InsertScreenState();
-}
-class _InsertScreenState extends State<InsertScreen> {
-  final _formKey = GlobalKey<FormState>();
-  int? _cantidad;
-  List<int>? _arr;
-  List<int>? _sortedArr;
-  Duration? _elapsedTime;
 
-  List<int> _generarArrayAleatorio(int cantidad) {
-    Random rng = Random();
-    return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+class InsertionSortScreen extends StatefulWidget {
+  @override
+  _InsertionSortScreenState createState() => _InsertionSortScreenState();
+}
+
+class _InsertionSortScreenState extends State<InsertionSortScreen> {
+  final _formKey = GlobalKey<FormState>();
+  List<int> _unsortedList = [];
+  List<int>? _sortedList;
+  Stopwatch _stopwatch = Stopwatch();
+
+  @override
+  void dispose() {
+    _stopwatch.stop();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Insert Sort'),
+        title: Text('Insertion Sort Resultado'),
       ),
       body: Center(
-        child: _sortedArr == null
+        child: _sortedList == null
             ? Form(
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextFormField(
-                      decoration: InputDecoration(labelText: 'Cantidad de elementos'),
+                      decoration: InputDecoration(labelText: 'Ingrese un número'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, ingrese un número';
                         }
                         final n = int.tryParse(value);
-                        if (n == null || n <= 0) {
+                        if (n == null) {
                           return 'Por favor, ingrese un número válido';
                         }
                         return null;
                       },
-                      onSaved: (value) => _cantidad = int.parse(value!),
+                      onSaved: (value) {
+                        _unsortedList.add(int.parse(value!));
+                      },
                     ),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           setState(() {
-                            _arr = _generarArrayAleatorio(_cantidad!);
-                            Stopwatch stopwatch = Stopwatch()..start();
-                            print(_arr);
-                            _sortedArr = insertionSort(_arr!);
-                            print(_arr);
-                            stopwatch.stop();
-                            _elapsedTime = stopwatch.elapsed;
+                            // Agregado manualmente a la lista, no se genera automáticamente
                           });
                         }
                       },
-                      child: Text('Generar y ordenar array'),
+                      child: Text('Agregar a la lista'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_unsortedList.isNotEmpty) {
+                          setState(() {
+                            _startSorting();
+                          });
+                        }
+                      },
+                      child: Text('Ordenar lista'),
                     ),
                   ],
                 ),
@@ -67,32 +74,43 @@ class _InsertScreenState extends State<InsertScreen> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Array antes de ordenar:'),
-                  Text(_arr.toString()),
+                  Text('Lista antes de ordenar:'),
+                  Text(_unsortedList.toString()),
                   SizedBox(height: 20),
-                  Text('Array después de ordenar:'),
-                  Text(_sortedArr.toString()),
+                  Text('Lista después de ordenar:'),
+                  Text(_sortedList!.toString()),
                   SizedBox(height: 20),
                   Text('Tiempo transcurrido:'),
-                  Text('${(_elapsedTime!.inMicroseconds / 1000000).toStringAsFixed(4)} segundos'),
+                  Text('${(_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(4)} segundos'),
                 ],
               ),
       ),
     );
   }
-}
 
-List<int> insertionSort(List<int> arrinput) {
-  List<int> arr = [...arrinput];
-  for (int i = 1; i < arr.length; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= 0 && arr[j] > key) {
-      arr[j + 1] = arr[j];
-      j--;
-    }
-    arr[j + 1] = key;
+  void _startSorting() {
+    _sortedList = null;
+    _stopwatch.reset();
+    _stopwatch.start();
+    _insertionSort();
   }
 
-  return arr;
+  void _insertionSort() async {
+    _sortedList = List<int>.from(_unsortedList);
+    for (int i = 1; i < _sortedList!.length; i++) {
+      int key = _sortedList![i];
+      int j = i - 1;
+
+      while (j >= 0 && _sortedList![j] > key) {
+        _sortedList![j + 1] = _sortedList![j];
+        j--;
+      }
+
+      _sortedList![j + 1] = key;
+
+      await Future.delayed(Duration(milliseconds: 100));
+      setState(() {});
+    }
+    _stopwatch.stop();
+  }
 }
