@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class ShellSortScreen extends StatefulWidget {
@@ -10,6 +12,11 @@ class _ShellSortScreenState extends State<ShellSortScreen> {
   List<int> _unsortedList = [];
   List<int>? _sortedList;
   Stopwatch _stopwatch = Stopwatch();
+  TextEditingController campo=TextEditingController();
+  List<int> _generarArrayAleatorio(int cantidad) {
+    Random rng = Random();
+    return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+  }
 
   @override
   void dispose() {
@@ -33,6 +40,7 @@ class _ShellSortScreenState extends State<ShellSortScreen> {
                     TextFormField(
                       decoration: InputDecoration(labelText: 'Ingrese un número'),
                       keyboardType: TextInputType.number,
+                      controller: campo,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, ingrese un número';
@@ -45,6 +53,7 @@ class _ShellSortScreenState extends State<ShellSortScreen> {
                       },
                       onSaved: (value) {
                         _unsortedList.add(int.parse(value!));
+                        campo.clear();
                       },
                     ),
                     ElevatedButton(
@@ -67,6 +76,15 @@ class _ShellSortScreenState extends State<ShellSortScreen> {
                         }
                       },
                       child: Text('Ordenar lista'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                          setState(() {
+                            _unsortedList = _generarArrayAleatorio(int.parse(campo.text));
+                            _startSorting();
+                          });
+                      },
+                      child: Text('Generar lista aleatorea'),
                     ),
                   ],
                 ),
