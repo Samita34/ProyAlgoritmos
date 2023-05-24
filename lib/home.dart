@@ -102,12 +102,12 @@ class _MyhomeState extends State<Myhome> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: PreferredSize(
+        /*appBar: PreferredSize(
           preferredSize: Size.fromHeight(20),
           child: AppBar(
             backgroundColor: Color(0xFF2D2D34),
           ),
-        ),
+        ),*/
         //backgroundColor: Color.fromARGB(255, 168, 255, 251),
         backgroundColor: Color(0xFF2D2D34),
         //Pila que almacena todos los objetos
