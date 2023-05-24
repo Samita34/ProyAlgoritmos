@@ -102,117 +102,6 @@ class _MyhomeState extends State<Myhome> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        drawer: Drawer(
-          backgroundColor: Color(0xFF2D2D34),
-          child: ListView(
-            children: [
-              Container(padding: EdgeInsets.all(35)),
-              Ink(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade900
-                    ]),
-                    border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)),
-                child: ListTile(
-                  title: Text(
-                    'Selection sort',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SelectionSortScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Container(padding: EdgeInsets.all(10)),
-              Ink(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    Colors.teal.shade50,
-                    Colors.teal.shade50,
-                    Colors.teal.shade50,
-                    Colors.teal.shade50,
-                    Colors.teal.shade900
-                  ]),
-                  border: Border.all(width: 2),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: ListTile(
-                  title: Text(
-                    'Insertion sort',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InsertionSortScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Container(padding: EdgeInsets.all(10)),
-              Ink(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade900
-                    ]),
-                    border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)),
-                child: ListTile(
-                  title: Text(
-                    'Shell sort',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ShellSortScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Container(padding: EdgeInsets.all(10)),
-              Ink(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade50,
-                      Colors.teal.shade900
-                    ]),
-                    border: Border.all(width: 2),
-                    borderRadius: BorderRadius.circular(50)),
-                child: ListTile(
-                  title: Text(
-                    'Merge sort',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  onTap: () {
-                    onMergeSortButtonPressed(context);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(20),
           child: AppBar(
@@ -640,6 +529,60 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             */
+            Expanded(child: Container()),
+            SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              mini: true,
+              childrenButtonSize: const Size(50.0, 50.0),
+              children: [
+                SpeedDialChild(
+                    child: Icon(Icons.sort),
+                    label: "Selection Sort",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SelectionSortScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_by_alpha_outlined),
+                    label: "Insertion Sort",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InsertionSortScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_by_alpha_sharp),
+                    label: "Merge Sort",
+                    onTap: () => setState(() {
+                          onMergeSortButtonPressed(context);
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_rounded),
+                    label: "Shell Sort",
+                    onTap: () => setState(() {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => ShellSortScreen(),
+                        ),
+                      );
+                    })),
+                SpeedDialChild(
+                    child: Icon(Icons.help),
+                    label: "Help",
+                    onTap: () => setState(() {
+                          modo = 5;
+                          eliminarBoceto();
+                        })),
+              ],
+            ),
             Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
