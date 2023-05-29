@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
-import 'package:flutter/rendering.dart' as rendering;
+//import 'package:flutter/rendering.dart' as rendering;
 
 //Inicio del codigo
 void main() {

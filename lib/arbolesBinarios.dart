@@ -141,18 +141,24 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                   children: [
                     SpeedDialChild(
                       child: Icon(Icons.linear_scale),
-                      label: 'Preorder',
-                      onTap: () {},
+                      label: 'PreOrder',
+                      onTap: () {
+                        _showDialogPre();
+                      },
                     ),
                     SpeedDialChild(
                       child: Icon(Icons.linear_scale),
-                      label: 'Posorder',
-                      onTap: () {},
+                      label: 'PosOrder',
+                      onTap: () {
+                        _showDialogPost();
+                      },
                     ),
                     SpeedDialChild(
                       child: Icon(Icons.linear_scale),
-                      label: 'Inorder',
-                      onTap: () {},
+                      label: 'InOrder',
+                      onTap: () {
+                        _showDialogIn();
+                      },
                     ),
                   ],
                 ),
@@ -161,6 +167,66 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showDialogIn() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('InOrder'),
+          content: Text(objArbol.inOrder(objArbol.raiz)),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialogPost() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('PostOrder'),
+          content: Text(objArbol.postOrder(objArbol.raiz)),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialogPre() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('PreOrder'),
+          content: Text(objArbol.preOrder(objArbol.raiz)),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

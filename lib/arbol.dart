@@ -30,4 +30,34 @@ class Arbol {
   set raiz(Nodo? n) {
     _raiz = n;
   }
+
+  String inOrder(Nodo? nodo) {
+    if (nodo != null) {
+      return inOrder(nodo.izquierda) +
+          nodo.dato.toString() +
+          ", " +
+          inOrder(nodo.derecha);
+    }
+    return "";
+  }
+
+  String preOrder(Nodo? nodo) {
+    if (nodo != null) {
+      return nodo.dato.toString() +
+          ", " +
+          preOrder(nodo.izquierda) +
+          preOrder(nodo.derecha);
+    }
+    return "";
+  }
+
+  String postOrder(Nodo? nodo) {
+    if (nodo != null) {
+      return postOrder(nodo.izquierda) +
+          postOrder(nodo.derecha) +
+          nodo.dato.toString() +
+          ", ";
+    }
+    return "";
+  }
 }

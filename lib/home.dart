@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -5,7 +7,8 @@ import 'package:grafos/johnson.dart';
 import 'package:grafos/norwest.dart';
 import 'modelos.dart';
 import 'figura.dart';
-//import 'help.dart';
+import 'selection.dart';
+import 'dijkstra.dart';
 import 'matriz.dart';
 import 'hungarian_algorithm.dart';
 import 'dbprueba.dart';
@@ -13,7 +16,12 @@ import 'norwest.dart';
 import 'matnor.dart';
 import 'dart:io';
 import 'asignacion2.dart';
+import 'mergesort.dart';
+import 'insertionsort.dart';
+import 'shellsort.dart';
+import 'arbolesBinarios.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/cupertino.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -38,6 +46,12 @@ class _MyhomeState extends State<Myhome> {
   int contadorNodos = 1;
   bool estadoj = false;
   List<String> estj = [];
+  final Random rng = Random();
+
+  List<int> _generarArrayAleatorio(int cantidad) {
+    return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+  }
+
   /*
   *  Variables que almacenan la posición donde se hace un toque
   * (x,y) variables que detectan el toque
@@ -90,6 +104,12 @@ class _MyhomeState extends State<Myhome> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        /*appBar: PreferredSize(
+          preferredSize: Size.fromHeight(20),
+          child: AppBar(
+            backgroundColor: Color(0xFF2D2D34),
+          ),
+        ),*/
         //backgroundColor: Color.fromARGB(255, 168, 255, 251),
         backgroundColor: Color(0xFF2D2D34),
         //Pila que almacena todos los objetos
@@ -367,106 +387,180 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "johnson",
-              onPressed: () {
-                creaJon();
-              },
-              child: const Icon(
-                Icons.linear_scale,
-                size: 40,
-              ),
-            ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "asignacion",
-              onPressed: () {
-                List<dynamic> asignacionOptimaMin = calcularAsignacionOptima();
-                List<dynamic> asignacionOptimaMax = calcularAsignacionOptima2();
-                print(asignacionOptimaMin);
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("Asignación óptima"),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Minimización:"),
-                            ...asignacionOptimaMin[1]
-                                .asMap()
-                                .entries
-                                .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
-                                .toList(),
-                            SizedBox(height: 16),
-                            Text("Sumatoria: ${asignacionOptimaMin[0]}"),
 
-                            SizedBox(
-                                height:
-                                    16), // Agregar espacio entre los resultados
-                            Text("Maximización:"),
-                            ...asignacionOptimaMax[1]
-                                .asMap()
-                                .entries
-                                .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
-                                .toList(),
-                            SizedBox(height: 16),
-                            Text("Sumatoria: ${asignacionOptimaMax[0]}"),
+            Expanded(child: Container()),
+            SpeedDial(
+              animatedIcon: AnimatedIcons.arrow_menu,
+              mini: true,
+              childrenButtonSize: const Size(50.0, 50.0),
+              children: [
+                SpeedDialChild(
+                    child: Icon(Icons.linear_scale),
+                    label: 'Jon',
+                    onTap: () => setState(() {
+                          setState(() {
+                            creaJon();
+                            setState(() {});
+                          });
+                        })
+                    //onTap: () {
+                    //
+                    //},
+                    ),
+                SpeedDialChild(
+                  child: Icon(Icons.mediation),
+                  label: 'Asignación óptima',
+                  onTap: () {
+                    List<dynamic> asignacionOptimaMin =
+                        calcularAsignacionOptima();
+                    List<dynamic> asignacionOptimaMax =
+                        calcularAsignacionOptima2();
+                    print(asignacionOptimaMin);
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Asignación óptima"),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Minimización:"),
+                                ...asignacionOptimaMin[1]
+                                    .asMap()
+                                    .entries
+                                    .map((entry) => Text(
+                                        "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                    .toList(),
+                                SizedBox(height: 16),
+                                Text("Sumatoria: ${asignacionOptimaMin[0]}"),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Text("Maximización:"),
+                                ...asignacionOptimaMax[1]
+                                    .asMap()
+                                    .entries
+                                    .map((entry) => Text(
+                                        "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                    .toList(),
+                                SizedBox(height: 16),
+                                Text("Sumatoria: ${asignacionOptimaMax[0]}"),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Aceptar"),
+                            ),
                           ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("Aceptar"),
-                        ),
-                      ],
+                        );
+                      },
                     );
                   },
-                );
-              },
-              child: const Icon(
-                Icons.mediation,
-                size: 40,
-              ),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.north_west),
+                  label: 'Norwest',
+                  onTap: () async {
+                    of = [];
+                    dem = [];
+
+                    List<List<String>> matrizAdyacencia = [];
+                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+                    continueDialogs = true;
+
+                    await _showDialogsDem(context, matrizAdyacencia, of, dem);
+                    await _showDialogsOf(context, matrizAdyacencia, of, dem);
+                  },
+                ),
+                SpeedDialChild(
+                    child: Icon(Icons.diamond_sharp),
+                    label: 'Dijkstra',
+                    onTap: () => setState(() {
+                          setState(() {
+                            _showDijkstraDialog(context);
+                            setState(() {});
+                          });
+                        })
+                    //onTap: () {
+                    //
+                    //
+                    //},
+                    ),
+                SpeedDialChild(
+                    child: Icon(Icons.category),
+                    label: "Arboles Binarios",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ArbolesBinariosScreen(),
+                            ),
+                          );
+                        })),
+              ],
+            ),
+            //Expanded(child: Container()),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            SpeedDial(
+              animatedIcon: AnimatedIcons.view_list,
+              mini: true,
+              childrenButtonSize: const Size(50.0, 50.0),
+              children: [
+                SpeedDialChild(
+                    child: Icon(Icons.sort),
+                    label: "Selection Sort",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SelectionSortScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_by_alpha_outlined),
+                    label: "Insertion Sort",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InsertionSortScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_by_alpha_sharp),
+                    label: "Merge Sort",
+                    onTap: () => setState(() {
+                          onMergeSortButtonPressed(context);
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.sort_rounded),
+                    label: "Shell Sort",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ShellSortScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.help),
+                    label: "Help",
+                    onTap: () => setState(() {
+                          modo = 5;
+                          eliminarBoceto();
+                        })),
+              ],
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "norwest",
-              onPressed: () async {
-                of = [];
-                dem = [];
-
-                List<List<String>> matrizAdyacencia = [];
-                matrizAdyacencia = generaMatriz(matrizAdyacencia);
-                continueDialogs = true;
-                //showDialogSequence(context, 1, matrizAdyacencia, of, dem);
-                await _showDialogsDem(context, matrizAdyacencia, of, dem);
-                await _showDialogsOf(context, matrizAdyacencia, of, dem);
-                //for  (int i = 0; i < matrizAdyacencia.length; i++) {
-                //  _showDialogDem(context, i - 1);
-                //}
-
-                //print(jon.calcJon(matrizAdyacencia));
-              },
-              child: const Icon(
-                Icons.north_west,
-                size: 40,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
-              ),
-            ),
-            Expanded(child: Container()),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
               mini: true,
@@ -583,21 +677,19 @@ class _MyhomeState extends State<Myhome> {
       }
       matrizAdyacencia.add(v);
     }
-    vLineas.forEach((linea) {
-      int f = int.parse(linea.Ni.codigo);
-      int c = int.parse(linea.Nf.codigo);
-      int valorLinea = int.parse(linea.valor);
-      if (linea.tipo == 0) {
+    for (int i = 0; i < vLineas.length; i++) {
+      int f = v2.indexOf(vLineas[i].Ni.nombre);
+      int c = v2.indexOf(vLineas[i].Nf.nombre);
+      int valorLinea = int.parse(vLineas[i].valor);
+      if (vLineas[i].tipo == 0) {
         List<String> fila = [...matrizAdyacencia[c]];
         fila[f] = valorLinea.toString();
         matrizAdyacencia[c] = fila;
-
-        print(fila);
       }
       List<String> fila = [...matrizAdyacencia[f]];
       fila[c] = valorLinea.toString();
       matrizAdyacencia[f] = fila;
-    });
+    }
     return matrizAdyacencia;
   }
 
@@ -792,6 +884,8 @@ class _MyhomeState extends State<Myhome> {
     );
   }
 
+// ...
+
   Future<void> _showDialogOf(
       BuildContext context,
       int con,
@@ -901,6 +995,83 @@ class _MyhomeState extends State<Myhome> {
     }
   }
 
+  _pruebashowDijkstraDialog(BuildContext context) {
+    TextEditingController text1Controller = TextEditingController();
+    TextEditingController text2Controller = TextEditingController();
+    int selectedOption = 1;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Ingrese rango'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: text1Controller,
+                decoration: const InputDecoration(
+                  labelText: 'Inicio',
+                ),
+              ),
+              TextField(
+                controller: text2Controller,
+                decoration: const InputDecoration(
+                  labelText: 'Final',
+                ),
+              ),
+              //SizedBox(height: 16),
+              RadioListTile(
+                title: const Text('Maximizar'),
+                value: 1,
+                groupValue: selectedOption,
+                onChanged: (value) {
+                  setState(() {
+                    selectedOption = value!;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: const Text('Minimizar'),
+                value: 2,
+                groupValue: selectedOption,
+                onChanged: (value) {
+                  setState(() {
+                    selectedOption = value!;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String text1 = text1Controller.text;
+                String text2 = text2Controller.text;
+                creaJon();
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+            TextButton(
+              onPressed: () {
+                clearLineas();
+                Navigator.of(context).pop();
+              },
+              child: Text('Cls'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _showDialogsOf(
       BuildContext context,
       List<List<String>> matrizAdyacencia,
@@ -951,6 +1122,96 @@ class _MyhomeState extends State<Myhome> {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => matnor(res[1], matrizAdyacencia, res[0]),
     ));
+  }
+
+  _showDijkstraDialog(context) {
+    TextEditingController text1Controller = TextEditingController();
+    TextEditingController text2Controller = TextEditingController();
+    int selectedOption = 1;
+
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        //barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setStatem) {
+            return AlertDialog(
+              //Titulo del mensaje
+              title: const Text("Ingrese Rango"),
+
+              //TextField para recibir un valor
+              content: Form(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: text1Controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Inicio',
+                    ),
+                  ),
+                  TextField(
+                    controller: text2Controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Final',
+                    ),
+                  ),
+                  //SizedBox(height: 16),
+                  RadioListTile(
+                    title: const Text('Maximizar'),
+                    value: 1,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text('Minimizar'),
+                    value: 2,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                ],
+              )),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    String text1 = text1Controller.text;
+                    String text2 = text2Controller.text;
+                    text1 = text1.isEmpty ? "." : text1;
+                    text2 = text2.isEmpty ? "." : text2;
+
+                    creaDijkstra(selectedOption, text1, text2);
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    clearLineas();
+                    //pruebalins();
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cls'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancelar'),
+                ),
+              ],
+            );
+          });
+        });
   }
 
   //Mensaje de alerta para la Unir dos nodos
@@ -1008,9 +1269,10 @@ class _MyhomeState extends State<Myhome> {
                       ModeloLinea h;
                       if (nodoAux == e) {
                         tipo = -1;
-                        h = ModeloLinea(e, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(e, e, receptorMensaje.text, tipo, "");
                       } else {
-                        h = ModeloLinea(nodoAux, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(
+                            nodoAux, e, receptorMensaje.text, tipo, "");
                       }
                       //Añade esa linea a la lista
                       vLineas.add(h);
@@ -1610,7 +1872,7 @@ class _MyhomeState extends State<Myhome> {
           Nff = Nodo;
         }
       });
-      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3])));
+      vLineas.add(ModeloLinea(Nii, Nff, Linea[2], int.parse(Linea[3]), ""));
     }
   }
 
@@ -1625,9 +1887,15 @@ class _MyhomeState extends State<Myhome> {
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Johnson jon = Johnson();
     int i = 1;
-    var aux = jon.calcJon(matrizAdyacencia);
+    var jonson = jon.calcJon(matrizAdyacencia);
+    var aux = jonson[0];
+
+    List<int> vals = jon.mays(matrizAdyacencia);
+
+    List<int> valsn = jon.mins(matrizAdyacencia, jonson[1]);
+
     llenalis(aux);
-    //estj=List<String>.from(aux);
+    var holgs = jon.sacaHolg(matrizAdyacencia, aux, jonson[1], vals, valsn);
 
     if (comparaLis(aux, estj) == true) {
       estadoj = !estadoj;
@@ -1636,13 +1904,36 @@ class _MyhomeState extends State<Myhome> {
     }
 
     if (estadoj == true) {
-      vLineas.forEach((linea) {
-        if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
-          linea.tipo = 5;
-          i++;
+      for (int i = 0; i < holgs.length; i++) {
+        for (int j = 0; j < holgs.length; j++) {
+          vLineas.forEach((linea) {
+            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
+                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
+              linea.holg = "h: " + holgs[i][j];
+            }
+          });
         }
-      });
+      }
+
+      while (i < aux.length) {
+        vLineas.forEach((linea) {
+          if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
+            linea.tipo = 5;
+            i++;
+          }
+        });
+      }
     } else {
+      for (int i = 0; i < holgs.length; i++) {
+        for (int j = 0; j < holgs.length; j++) {
+          vLineas.forEach((linea) {
+            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
+                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
+              linea.holg = "";
+            }
+          });
+        }
+      }
       vLineas.forEach((linea) {
         linea.tipo = 1;
       });
@@ -1662,7 +1953,8 @@ class _MyhomeState extends State<Myhome> {
     int s = 0;
     if (t1 == t2) {
       for (int i = 0; i < t1; i++) {
-        if (identical(l1[i], l2[i])) {
+        //if (identical(l1[i], l2[i])) {
+        if (l1[i] == l2[i]) {
           s++;
         }
       }
@@ -1671,5 +1963,119 @@ class _MyhomeState extends State<Myhome> {
       return true;
     }
     return false;
+  }
+
+/*
+  selectionSort() {
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    Selection selec = Selection();
+    return selec.selection(matrizAdyacencia);
+  }
+*/
+
+  Future<void> onMergeSortButtonPressed(BuildContext context) async {
+    List<int> arr = _generarArrayAleatorio(10);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MergeSortScreen(),
+      ),
+    );
+  }
+
+  Future<void> onShellSortButtonPressed(BuildContext context) async {
+    List<int> arr = _generarArrayAleatorio(10);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ShellSortScreen(),
+      ),
+    );
+  }
+
+  creaDijkstra(int mxmn, String txt1, String txt2) {
+    clearLineas();
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    Dijkstra dij = Dijkstra();
+    int i = 1;
+
+    List<dynamic> dijkstra =
+        dij.dijkstraMax(matrizAdyacencia, inicio: txt1, fin: txt2);
+
+    if (mxmn != 1) {
+      dijkstra = dij.dijkstraMin(matrizAdyacencia, inicio: txt1, fin: txt2);
+    }
+
+    //else {
+    //  dijkstra = dij.dijkstraMin(matrizAdyacencia);
+    //}
+
+    List<String> aux = dijkstra[0];
+    print(aux);
+    print(dijkstra[1]);
+
+    //print(aux);
+
+    //clearLineas();
+    //while (i < aux.length) {
+    //  if (vLineas[j - 1].Ni.nombre == aux[i - 1] &&
+    //      vLineas[j - 1].Nf.nombre == aux[i]) {
+    //    vLineas[j - 1].tipo = 6;
+    //    i++;
+    //  }
+    //  j = (j % vLineas.length) + 1;
+//
+    //  print(j);
+    //}
+
+    //while (i < aux.length) {
+    //vLineas.forEach((linea) {
+    //  if ((linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) ||
+    //      (linea.Nf.nombre == aux[i - 1] && linea.Ni.nombre == aux[i])) {
+    //    //linea.tipo = 6;
+    //    if (linea.tipo == 1) {
+    //      linea.tipo = 5;
+    //    } else if (linea.tipo == 0) {
+    //      linea.tipo = 6;
+    //    }
+    //    if (i < aux.length - 1) {
+    //      i++;
+    //    }
+    //  }
+    //});
+    for (int i = 1; i < aux.length; i++) {
+      for (int j = 0; j < vLineas.length; j++) {
+        var linea = vLineas[j];
+        if ((linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) ||
+            (linea.Nf.nombre == aux[i - 1] && linea.Ni.nombre == aux[i])) {
+          if (linea.tipo == 1) {
+            linea.tipo = 5;
+          } else if (linea.tipo == 0) {
+            linea.tipo = 6;
+          }
+          break; // Salir del bucle interno si se encuentra la línea correspondiente
+        }
+      }
+    }
+
+    //}
+  }
+
+  clearLineas() {
+    vLineas.forEach((linea) {
+      if (linea.tipo == 5) {
+        linea.tipo = 1;
+      } else if (linea.tipo == 6) {
+        linea.tipo = 0;
+      }
+    });
+  }
+
+  pruebalins() {
+    vLineas.forEach((linea) {
+      linea.tipo = 6;
+    });
   }
 }
