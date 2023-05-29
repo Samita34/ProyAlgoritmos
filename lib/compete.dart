@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class CompetSortScreen extends StatefulWidget {
+class CompeteScreen extends StatefulWidget {
   @override
-  _CompetScreenState createState() => _CompetScreenState();
+  _CompeteScreenState createState() => _CompeteScreenState();
 }
 
-class _CompetScreenState extends State<CompetSortScreen> {
+class _CompeteScreenState extends State<CompeteScreen> {
   final _formKey = GlobalKey<FormState>();
   List<double> _unsortedList = [];
   List<double>? _sortedList;
