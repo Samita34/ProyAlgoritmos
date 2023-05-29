@@ -20,6 +20,7 @@ import 'mergesort.dart';
 import 'insertionsort.dart';
 import 'shellsort.dart';
 import 'arbolesBinarios.dart';
+import 'compete.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/cupertino.dart';
 
@@ -500,6 +501,17 @@ class _MyhomeState extends State<Myhome> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ArbolesBinariosScreen(),
+                            ),
+                          );
+                        })),
+                SpeedDialChild(
+                    child: Icon(Icons.cyclone),
+                    label: "Compete",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CompeteScreen(),
                             ),
                           );
                         })),
