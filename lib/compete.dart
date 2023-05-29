@@ -117,7 +117,8 @@ class _CompeteScreenState extends State<CompeteScreen> {
   _sortedList = List<double>.from(_unsortedList);
   double auxX = _sortedList![0];
   double auxY = _sortedList![1];
-  while(true){
+  bool flag=true;
+  while(flag){
     auxX = _sortedList![0];
     auxY = _sortedList![1];
     for (int k = 0; k < _sortedList!.length - 3; k += 2) {
@@ -126,7 +127,10 @@ class _CompeteScreenState extends State<CompeteScreen> {
     }
     _sortedList![_sortedList!.length - 2] = (_sortedList![_sortedList!.length - 2] + auxX) / 2;
     _sortedList![_sortedList!.length-1] = (_sortedList![_sortedList!.length-1] + auxY) / 2;
-    if(_sortedList![0]==_sortedList![_sortedList!.length-2])break;
+    for (int k = 0; k < _sortedList!.length - 3; k ++) {
+      flag=false;
+      if(_sortedList![k]!=_sortedList![k+2])flag=true;
+    }
   }
   _stopwatch.stop();
 }
