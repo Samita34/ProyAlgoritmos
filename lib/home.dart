@@ -19,6 +19,7 @@ import 'asignacion2.dart';
 import 'mergesort.dart';
 import 'insertionsort.dart';
 import 'shellsort.dart';
+import 'arbolesBinarios.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Myhome extends StatefulWidget {
@@ -385,153 +386,114 @@ class _MyhomeState extends State<Myhome> {
               ),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "johnson",
-              onPressed: () {
-                creaJon();
-              },
-              child: const Icon(
-                Icons.linear_scale,
-                size: 40,
-              ),
-            ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "asignacion",
-              onPressed: () {
-                List<dynamic> asignacionOptimaMin = calcularAsignacionOptima();
-                List<dynamic> asignacionOptimaMax = calcularAsignacionOptima2();
-                print(asignacionOptimaMin);
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("Asignación óptima"),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Minimización:"),
-                            ...asignacionOptimaMin[1]
-                                .asMap()
-                                .entries
-                                .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
-                                .toList(),
-                            SizedBox(height: 16),
-                            Text("Sumatoria: ${asignacionOptimaMin[0]}"),
-
-                            SizedBox(
-                                height:
-                                    16), // Agregar espacio entre los resultados
-                            Text("Maximización:"),
-                            ...asignacionOptimaMax[1]
-                                .asMap()
-                                .entries
-                                .map((entry) => Text(
-                                    "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
-                                .toList(),
-                            SizedBox(height: 16),
-                            Text("Sumatoria: ${asignacionOptimaMax[0]}"),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("Aceptar"),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Icon(
-                Icons.mediation,
-                size: 40,
-              ),
-            ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "norwest",
-              onPressed: () async {
-                of = [];
-                dem = [];
-
-                List<List<String>> matrizAdyacencia = [];
-                matrizAdyacencia = generaMatriz(matrizAdyacencia);
-                continueDialogs = true;
-                //showDialogSequence(context, 1, matrizAdyacencia, of, dem);
-                await _showDialogsDem(context, matrizAdyacencia, of, dem);
-                await _showDialogsOf(context, matrizAdyacencia, of, dem);
-                //for  (int i = 0; i < matrizAdyacencia.length; i++) {
-                //  _showDialogDem(context, i - 1);
-                //}
-
-                //print(jon.calcJon(matrizAdyacencia));
-              },
-              child: const Icon(
-                Icons.north_west,
-                size: 40,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
-              ),
-            ),
-
-            /*
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
-            FloatingActionButton(
-              mini: true,
-              heroTag: "selection",
-              onPressed: () {
-                List<int> aux = selectionSort();
-                String qwq = "";
-                for (int i = 0; i < aux.length; i++) {
-                  qwq += aux[i].toString() + " ";
-                }
-
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("Ordenamiento Selection Sort"),
-                      content: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("$qwq"),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("Aceptar"),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Icon(
-                Icons.add_road,
-                size: 40,
-              ),
-            ),
-            */
+           
             Expanded(child: Container()),
             SpeedDial(
-              animatedIcon: AnimatedIcons.menu_close,
+              animatedIcon: AnimatedIcons.arrow_menu,
+              mini: true,
+              childrenButtonSize: const Size(50.0, 50.0),
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.linear_scale),
+                  label: 'Jon',
+                  onTap: () {
+                    creaJon();
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.mediation),
+                  label: 'Asignación óptima',
+                  onTap: () {
+                    List<dynamic> asignacionOptimaMin = calcularAsignacionOptima();
+                    List<dynamic> asignacionOptimaMax = calcularAsignacionOptima2();
+                    print(asignacionOptimaMin);
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Asignación óptima"),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Minimización:"),
+                                ...asignacionOptimaMin[1]
+                                    .asMap()
+                                    .entries
+                                    .map((entry) => Text(
+                                        "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                    .toList(),
+                                SizedBox(height: 16),
+                                Text("Sumatoria: ${asignacionOptimaMin[0]}"),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Text("Maximización:"),
+                                ...asignacionOptimaMax[1]
+                                    .asMap()
+                                    .entries
+                                    .map((entry) => Text(
+                                        "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
+                                    .toList(),
+                                SizedBox(height: 16),
+                                Text("Sumatoria: ${asignacionOptimaMax[0]}"),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Aceptar"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.north_west),
+                  label: 'Norwest',
+                  onTap: () async {
+                    of = [];
+                    dem = [];
+
+                    List<List<String>> matrizAdyacencia = [];
+                    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+                    continueDialogs = true;
+
+                    await _showDialogsDem(context, matrizAdyacencia, of, dem);
+                    await _showDialogsOf(context, matrizAdyacencia, of, dem);
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.diamond_sharp),
+                  label: 'Dijkstra',
+                  onTap: () async {
+                  },
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.category),
+                  label: "Arboles Binarios",
+                    onTap: () => setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ArbolesBinariosScreen(),
+                            ),
+                          );
+                        }
+                  )
+                ),
+              ],
+            ),
+            //Expanded(child: Container()),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            SpeedDial(
+              animatedIcon: AnimatedIcons.view_list,
               mini: true,
               childrenButtonSize: const Size(50.0, 50.0),
               children: [
@@ -583,7 +545,7 @@ class _MyhomeState extends State<Myhome> {
                         })),
               ],
             ),
-            Expanded(child: Container()),
+            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
               mini: true,
