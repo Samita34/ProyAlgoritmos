@@ -31,7 +31,10 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff071e3d),
+      //backgroundColor: Color(),
+      appBar: AppBar(
+        title: Text('Arboles Binarios Resultado'),
+      ),
       body: SingleChildScrollView(
         child: Container(
           child: Center(
@@ -43,7 +46,7 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                 ),
                 Center(
                   child: Text(
-                    "Arbol Binario de Busqueda",
+                    "Arboles Binarios",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
@@ -60,12 +63,12 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                 Padding(
                   padding: EdgeInsets.all(10),
                   child: TextField(
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.black),
                     controller: _textFieldController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: "Ingresa un número",
-                      hintStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),

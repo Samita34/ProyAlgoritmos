@@ -22,10 +22,10 @@ class ArbolPainter extends CustomPainter {
 
   void pintar(Canvas canvas, double x, double y, Nodo? n) {
     if (n == null) {
-      print("El nodo es nulo!");
+      //print("El nodo es nulo!");
     } else {
       Paint brushCirculoBorde = Paint()
-        ..color = const Color(0xff278ea5)
+        ..color = Colors.blue
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
@@ -37,7 +37,7 @@ class ArbolPainter extends CustomPainter {
         ..strokeWidth = 0;
 
       Paint brushLinea = Paint()
-        ..color = const Color(0xff278ea5)
+        ..color = Colors.black
         ..strokeCap = StrokeCap.round
         ..strokeWidth = 1.5;
 
