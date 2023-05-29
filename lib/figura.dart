@@ -112,6 +112,9 @@ class Lineas extends CustomPainter {
   final linea = Paint()
     ..color = Color.fromARGB(255, 116, 70, 243)
     ..strokeWidth = 4;
+  final lineav = Paint()
+    ..color = Color.fromRGBO(2, 241, 34, 1)
+    ..strokeWidth = 4;
   //aqui dibujamos
   @override
   void paint(Canvas canvas, Size size) {
@@ -191,6 +194,14 @@ class Lineas extends CustomPainter {
         _msg((xi + xf) / 2, (yi + yf) / 2, e.valor.toString(), canvas);
         _holg(
             (xi + xf - 100) / 2, (yi + yf - 50) / 2, e.holg.toString(), canvas);
+      } else if (e.tipo == 6) {
+        //guardamos la posición de los nodos en offset
+        final p1 = Offset(e.Ni.x, e.Ni.y);
+        final p2 = Offset(e.Nf.x, e.Nf.y);
+        //dibujamos la linea con los offset
+        canvas.drawLine(p1, p2, lineav);
+        //dibujamos el mensaje
+        _msg(((e.Ni.x + e.Nf.x) / 2), ((e.Ni.y + e.Nf.y) / 2), e.valor, canvas);
       } else {
         final double radio = 35;
         final double anguloFlecha = math.pi / 5;
