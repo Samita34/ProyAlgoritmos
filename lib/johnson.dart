@@ -102,7 +102,7 @@ class Johnson {
     int fin = mat[0].indexOf(rutlar[rutlar.length - 1]);
     List<List<String>> nmat =
         List.generate(n, (_) => List.generate(n, (_) => "-"));
-    List<int> nums = [];
+    //List<int> nums = [];
     vuelta(pos, int sm) {
       if (esIni(mat, pos)) {
         return;
