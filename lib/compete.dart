@@ -114,25 +114,20 @@ class _CompeteScreenState extends State<CompeteScreen> {
   }
 
   void _comp() async {
-  _sortedList = List<double>.from(_unsortedList);
-  double auxX = _sortedList![0];
-  double auxY = _sortedList![1];
-  bool flag=true;
-  while(flag){
-    auxX = _sortedList![0];
-    auxY = _sortedList![1];
-    for (int k = 0; k < _sortedList!.length - 3; k += 2) {
-      _sortedList![k] = (_sortedList![k] + _sortedList![k + 2]) / 2;
-      _sortedList![k + 1] = (_sortedList![k + 1] + _sortedList![k + 3]) / 2;
+    _sortedList = [];
+    double sumX = 0;
+    double sumY = 0;
+
+    for (int i = 0; i < _unsortedList.length; i += 2) {
+      sumX += _unsortedList[i];
+      sumY += _unsortedList[i + 1];
     }
-    _sortedList![_sortedList!.length - 2] = (_sortedList![_sortedList!.length - 2] + auxX) / 2;
-    _sortedList![_sortedList!.length-1] = (_sortedList![_sortedList!.length-1] + auxY) / 2;
-    for (int k = 0; k < _sortedList!.length - 3; k ++) {
-      flag=false;
-      if(_sortedList![k]!=_sortedList![k+2])flag=true;
-    }
+
+    double centroidX = sumX / (_unsortedList.length / 2);
+    double centroidY = sumY / (_unsortedList.length / 2);
+    _sortedList?.add(centroidX);
+    _sortedList?.add(centroidY);
+    _stopwatch.stop();
   }
-  _stopwatch.stop();
-}
 
 }
