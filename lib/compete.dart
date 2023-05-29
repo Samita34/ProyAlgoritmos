@@ -96,10 +96,6 @@ class _CompeteScreenState extends State<CompeteScreen> {
                   SizedBox(height: 20),
                   Text('Coordenadas resultado:'),
                   Text(_sortedList!.toString()),
-                  SizedBox(height: 20),
-                  Text('Tiempo transcurrido:'),
-                  Text(
-                      '${(_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(4)} segundos'),
                 ],
               ),
       ),
