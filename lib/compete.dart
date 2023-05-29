@@ -91,11 +91,15 @@ class _CompeteScreenState extends State<CompeteScreen> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Lista antes de ordenar:'),
+                  Text('Lista de coordenadas dadas:'),
                   Text(_unsortedList.toString()),
                   SizedBox(height: 20),
                   Text('Coordenadas resultado:'),
                   Text(_sortedList!.toString()),
+                  SizedBox(height: 20),
+                  Text('Tiempo transcurrido:'),
+                  Text(
+                      '${(_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(4)} segundos'),
                 ],
               ),
       ),
@@ -110,19 +114,21 @@ class _CompeteScreenState extends State<CompeteScreen> {
   }
 
   void _comp() async {
-    _sortedList = [];
-    double sumX = 0;
-    double sumY = 0;
-
-    for (int i = 0; i < _unsortedList.length; i += 2) {
-      sumX += _unsortedList[i];
-      sumY += _unsortedList[i + 1];
+  _sortedList = List<double>.from(_unsortedList);
+  double auxX = _sortedList![0];
+  double auxY = _sortedList![1];
+  while(true){
+    auxX = _sortedList![0];
+    auxY = _sortedList![1];
+    for (int k = 0; k < _sortedList!.length - 3; k += 2) {
+      _sortedList![k] = (_sortedList![k] + _sortedList![k + 2]) / 2;
+      _sortedList![k + 1] = (_sortedList![k + 1] + _sortedList![k + 3]) / 2;
     }
-
-    double centroidX = sumX / (_unsortedList.length / 2);
-    double centroidY = sumY / (_unsortedList.length / 2);
-    _sortedList?.add(centroidX);
-    _sortedList?.add(centroidY);
-    _stopwatch.stop();
+    _sortedList![_sortedList!.length - 2] = (_sortedList![_sortedList!.length - 2] + auxX) / 2;
+    _sortedList![_sortedList!.length-1] = (_sortedList![_sortedList!.length-1] + auxY) / 2;
+    if(_sortedList![0]==_sortedList![_sortedList!.length-2])break;
   }
+  _stopwatch.stop();
+}
+
 }
