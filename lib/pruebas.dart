@@ -147,7 +147,7 @@ class _MyhomeState extends State<Myhome> {
                         //Muestra una alerta para pedir el nuevo número que será asignado a la conexión
                         _showDialogCambio(context, e, lineaAux);
                       } else if (verificaConexion(e) == 1) {
-                        vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1));
+                        vLineas.add(ModeloLinea(nodoAux, e, obtieneval(e), 1,""));
                       } else {
                         _showDialog(context, e);
                       }
@@ -514,9 +514,9 @@ class _MyhomeState extends State<Myhome> {
                       ModeloLinea h;
                       if (nodoAux == e) {
                         tipo = -1;
-                        h = ModeloLinea(e, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(e, e, receptorMensaje.text, tipo,"");
                       } else {
-                        h = ModeloLinea(nodoAux, e, receptorMensaje.text, tipo);
+                        h = ModeloLinea(nodoAux, e, receptorMensaje.text, tipo,"");
                       }
                       //Añade esa linea a la lista
                       vLineas.add(h);
