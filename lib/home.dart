@@ -1156,7 +1156,7 @@ class _MyhomeState extends State<Myhome> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Dirigido"),
+                      Text("No Dirigido"),
                       Checkbox(
                           value: isChecked,
                           onChanged: (checked) {
@@ -1173,7 +1173,7 @@ class _MyhomeState extends State<Myhome> {
 
                 TextButton(
                     onPressed: () {
-                      if (isChecked == true) {
+                      if (isChecked == false) {
                         tipo = 1;
                       } else {
                         tipo = 0;
@@ -1895,6 +1895,7 @@ class _MyhomeState extends State<Myhome> {
       ),
     );
   }
+
   Future<void> onShellSortButtonPressed(BuildContext context) async {
     List<int> arr = _generarArrayAleatorio(10);
     Navigator.push(
