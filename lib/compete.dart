@@ -12,6 +12,7 @@ class _CompeteScreenState extends State<CompeteScreen> {
   Stopwatch _stopwatch = Stopwatch();
   TextEditingController xController = TextEditingController();
   TextEditingController yController = TextEditingController();
+
   @override
   void dispose() {
     _stopwatch.stop();
@@ -96,6 +97,11 @@ class _CompeteScreenState extends State<CompeteScreen> {
                   SizedBox(height: 20),
                   Text('Coordenadas resultado:'),
                   Text(_sortedList!.toString()),
+                  SizedBox(height: 20),
+                  CustomPaint(
+                    size: Size(300, 300),
+                    painter: CoordinatePainter(_unsortedList,_sortedList!),
+                  ),
                 ],
               ),
       ),
@@ -125,5 +131,60 @@ class _CompeteScreenState extends State<CompeteScreen> {
     _sortedList?.add(centroidY);
     _stopwatch.stop();
   }
+}
 
+class CoordinatePainter extends CustomPainter {
+  final List<double> unsortedCoordinates;
+  final List<double> sortedCoordinates;
+
+  CoordinatePainter(this.unsortedCoordinates, this.sortedCoordinates);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    // Dibujar unsortedCoordinates
+    _drawPoints(canvas, unsortedCoordinates, centerX, centerY, paint);
+
+    paint.color = Colors.red;
+
+    // Dibujar sortedCoordinates
+    _drawPoints(canvas, sortedCoordinates, centerX, centerY, paint);
+
+    paint.color = Colors.green;
+
+    // Dibujar líneas conectando los puntos de sortedCoordinates
+    _drawLines(canvas, sortedCoordinates, centerX, centerY, paint);
+  }
+
+  void _drawPoints(Canvas canvas, List<double> coordinates, double centerX, double centerY, Paint paint) {
+    for (int i = 0; i < coordinates.length; i += 2) {
+      final x = coordinates[i];
+      final y = coordinates[i + 1];
+      final pointX = centerX + x * 10;
+      final pointY = centerY + y * 10;
+      canvas.drawCircle(Offset(pointX, pointY), 5, paint);
+    }
+  }
+
+  void _drawLines(Canvas canvas, List<double> coordinates, double centerX, double centerY, Paint paint) {
+    for (int i = 0; i < coordinates.length - 2; i += 2) {
+      final startX = centerX + coordinates[i] * 10;
+      final startY = centerY + coordinates[i + 1] * 10;
+      final endX = centerX + coordinates[i + 2] * 10;
+      final endY = centerY + coordinates[i + 3] * 10;
+      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
 }
