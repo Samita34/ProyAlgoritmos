@@ -137,6 +137,21 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.0),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _ingresoListaDialog(context);
+                      setState(() {});
+                    });
+                  },
+                  child: Text(
+                    "Ingresar una lista",
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                ),
                 SpeedDial(
                   animatedIcon: AnimatedIcons.menu_home,
                   mini: true,
@@ -232,4 +247,128 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
       },
     );
   }
+
+  _ingresoListaDialog(context) {
+    TextEditingController text1Controller = TextEditingController();
+    //TextEditingController text2Controller = TextEditingController();
+    int selectedOption = 1;
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setStatem) {
+            return AlertDialog(
+              title: const Text("Ingrese la lista (Separada por comas)"),
+              content: Form(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: text1Controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Lista',
+                    ),
+                  ),
+                  RadioListTile(
+                    title: const Text('InOrder'),
+                    value: 1,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text('PreOrder'),
+                    value: 2,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text('PostOrder'),
+                    value: 3,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                ],
+              )),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    String text1 = text1Controller.text;
+                    text1 = text1.isEmpty ? "." : text1;
+
+                    listToTree(selectedOption, text1);
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cls'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancelar'),
+                ),
+              ],
+            );
+          });
+        });
+  }
+
+  listToTree(int order, String list) {
+    List<int> arbolList = [];
+    List<String> stringList = list.split(",");
+    for (String str in stringList) {
+      arbolList.add(int.parse(str.trim()));
+    }
+
+    if (order == 1) {
+      
+    }
+    if (order == 2) {
+      constructBinaryTree(arbolList);
+    }
+    if (order == 3) {}
+  }
 }
+
+TreeNode? constructBinaryTree(List<int> preorder) {
+  if (preorder.isEmpty) {
+    return null;
+  }
+
+  TreeNode root = TreeNode(preorder[0]);
+  List<int> leftSubtree = [];
+  List<int> rightSubtree = [];
+
+  for (int i = 1; i < preorder.length; i++) {
+    if (preorder[i] < root.val) {
+      leftSubtree.add(preorder[i]);
+    } else {
+      rightSubtree.add(preorder[i]);
+    }
+  }
+
+  root.left = constructBinaryTree(leftSubtree);
+  root.right = constructBinaryTree(rightSubtree);
+
+  return root;
+}
+

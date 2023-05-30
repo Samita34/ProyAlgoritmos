@@ -31,7 +31,7 @@ class ArbolPainter extends CustomPainter {
         ..strokeWidth = 1.5;
 
       Paint brushCirculo = Paint()
-        ..color = const Color(0xff21e6c1)
+        ..color = Colors.green
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.fill
         ..strokeWidth = 0;
