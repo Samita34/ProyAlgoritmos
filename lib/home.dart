@@ -23,6 +23,7 @@ import 'arbolesBinarios.dart';
 import 'compete.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/cupertino.dart';
+import 'kruskal.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -34,6 +35,7 @@ class Myhome extends StatefulWidget {
 
 class _MyhomeState extends State<Myhome> {
   //Variable que recibe el valor de los mensajes
+  String sumaAlgor = "";
 
   TextEditingController receptorMensaje = TextEditingController();
   /*Variable para controlar el modo:
@@ -112,10 +114,21 @@ class _MyhomeState extends State<Myhome> {
           ),
         ),*/
         //backgroundColor: Color.fromARGB(255, 168, 255, 251),
-        backgroundColor: Color(0xFF2D2D34),
+        backgroundColor: const Color(0xFF2D2D34),
         //Pila que almacena todos los objetos
         body: Stack(
           children: [
+            Positioned(
+              top: 50,
+              left: 10,
+              child: Text(
+                sumaAlgor,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
             //Dibuja todos los bocetos
             CustomPaint(
               painter: boceto(Modeloboceto(xi, yi, xf, yf)),
@@ -331,7 +344,7 @@ class _MyhomeState extends State<Myhome> {
         ),
 
         floatingActionButton: Padding(
-          padding: EdgeInsets.only(left: 30),
+          padding: const EdgeInsets.only(left: 30),
           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             FloatingActionButton(
               mini: true,
@@ -343,51 +356,30 @@ class _MyhomeState extends State<Myhome> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => matriz(matrizAdyacencia)));
               },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
               child: const Icon(
                 Icons.apps_outage,
                 size: 40,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50),
-              ),
             ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            const Padding(padding: EdgeInsets.symmetric(horizontal: 10.0)),
             FloatingActionButton(
               mini: true,
-              heroTag: "help",
+              heroTag: "cls",
               onPressed: () {
-                showDialog(
-                    context: context,
-                    //El mensaje no se puede saltear
-                    barrierDismissible: false,
-                    builder: (context) {
-                      return AlertDialog(
-                        //titulo del mensaje
-                        title: Text("AYUDA"),
-                        content: Text(
-                            "La aplicación permite la graficación de grafos y obtener su matriz de adyacencia\nEl boton inferior derecho desplliega la lista de herramientas de la aplicación\n Para utilizar las herramientas se deben seleccionar de la lista\nBorrar todo: Elimina todos los nodos y conexiones actuales en el proyecto.\nEditar nodo: Permite tocar un nodo para editar su nombre/valor.\nMover nodo: Permite arrastrar los nodos en pantalla para una nueva posición.\nEliminar: Permite tocar un nodo para eliminarlo, incluyendo sus conexiones.\nCrear relación: Permite deslizar una conexión de un nodo a otro para luego darle un valor.\nCrear nodo: Permite colocar con un toque nuevos nodos en pantalla.\nFinalmente, el boton inferior izquierdo desplliega la matriz de adyacencia en base a los grafos en pantalla."),
-                        actions: [
-                          //Botón del mensaje de cancelar eliminación
-                          TextButton(
-                              onPressed: () {
-                                //sale del mensaje
-                                Navigator.of(context).pop();
-                              },
-                              //Mensaje del botón
-                              child: Text("Aceptar")),
-                        ],
-                      );
-                    });
+                clearLineas();
               },
-              child: const Icon(
-                Icons.help,
-                size: 40,
-              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50),
               ),
+              child: const Icon(
+                Icons.replay,
+                size: 40,
+              ),
             ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            const Padding(padding: EdgeInsets.symmetric(horizontal: 10.0)),
 
             Expanded(child: Container()),
             SpeedDial(
@@ -396,7 +388,7 @@ class _MyhomeState extends State<Myhome> {
               childrenButtonSize: const Size(50.0, 50.0),
               children: [
                 SpeedDialChild(
-                    child: Icon(Icons.linear_scale),
+                    child: const Icon(Icons.linear_scale),
                     label: 'Jon',
                     onTap: () => setState(() {
                           setState(() {
@@ -409,44 +401,43 @@ class _MyhomeState extends State<Myhome> {
                     //},
                     ),
                 SpeedDialChild(
-                  child: Icon(Icons.mediation),
+                  child: const Icon(Icons.mediation),
                   label: 'Asignación óptima',
                   onTap: () {
                     List<dynamic> asignacionOptimaMin =
                         calcularAsignacionOptima();
                     List<dynamic> asignacionOptimaMax =
                         calcularAsignacionOptima2();
-                    print(asignacionOptimaMin);
                     showDialog(
                       context: context,
                       barrierDismissible: false,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Asignación óptima"),
+                          title: const Text("Asignación óptima"),
                           content: SingleChildScrollView(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Minimización:"),
+                                const Text("Minimización:"),
                                 ...asignacionOptimaMin[1]
                                     .asMap()
                                     .entries
                                     .map((entry) => Text(
                                         "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                     .toList(),
-                                SizedBox(height: 16),
+                                const SizedBox(height: 16),
                                 Text("Sumatoria: ${asignacionOptimaMin[0]}"),
-                                SizedBox(
+                                const SizedBox(
                                   height: 16,
                                 ),
-                                Text("Maximización:"),
+                                const Text("Maximización:"),
                                 ...asignacionOptimaMax[1]
                                     .asMap()
                                     .entries
                                     .map((entry) => Text(
                                         "Tarea ${entry.key + 1}: ${entry.value[0]} asignada a ${entry.value[1]}"))
                                     .toList(),
-                                SizedBox(height: 16),
+                                const SizedBox(height: 16),
                                 Text("Sumatoria: ${asignacionOptimaMax[0]}"),
                               ],
                             ),
@@ -456,7 +447,7 @@ class _MyhomeState extends State<Myhome> {
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Aceptar"),
+                              child: const Text("Aceptar"),
                             ),
                           ],
                         );
@@ -465,7 +456,7 @@ class _MyhomeState extends State<Myhome> {
                   },
                 ),
                 SpeedDialChild(
-                  child: Icon(Icons.north_west),
+                  child: const Icon(Icons.north_west),
                   label: 'Norwest',
                   onTap: () async {
                     of = [];
@@ -480,7 +471,7 @@ class _MyhomeState extends State<Myhome> {
                   },
                 ),
                 SpeedDialChild(
-                    child: Icon(Icons.diamond_sharp),
+                    child: const Icon(Icons.diamond_sharp),
                     label: 'Dijkstra',
                     onTap: () => setState(() {
                           setState(() {
@@ -494,7 +485,7 @@ class _MyhomeState extends State<Myhome> {
                     //},
                     ),
                 SpeedDialChild(
-                    child: Icon(Icons.category),
+                    child: const Icon(Icons.category),
                     label: "Arboles Binarios",
                     onTap: () => setState(() {
                           Navigator.push(
@@ -505,7 +496,7 @@ class _MyhomeState extends State<Myhome> {
                           );
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.cyclone),
+                    child: const Icon(Icons.cyclone),
                     label: "Compete",
                     onTap: () => setState(() {
                           Navigator.push(
@@ -515,17 +506,31 @@ class _MyhomeState extends State<Myhome> {
                             ),
                           );
                         })),
+                SpeedDialChild(
+                    child: const Icon(Icons.nature_outlined),
+                    label: 'Kruskal',
+                    onTap: () => setState(() {
+                          setState(() {
+                            _showKruskalDialog(context);
+                            setState(() {});
+                          });
+                        })
+                    //onTap: () {
+                    //
+                    //
+                    //},
+                    ),
               ],
             ),
             //Expanded(child: Container()),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            const Padding(padding: EdgeInsets.symmetric(horizontal: 10.0)),
             SpeedDial(
               animatedIcon: AnimatedIcons.view_list,
               mini: true,
               childrenButtonSize: const Size(50.0, 50.0),
               children: [
                 SpeedDialChild(
-                    child: Icon(Icons.sort),
+                    child: const Icon(Icons.sort),
                     label: "Selection Sort",
                     onTap: () => setState(() {
                           Navigator.push(
@@ -536,7 +541,7 @@ class _MyhomeState extends State<Myhome> {
                           );
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.sort_by_alpha_outlined),
+                    child: const Icon(Icons.sort_by_alpha_outlined),
                     label: "Insertion Sort",
                     onTap: () => setState(() {
                           Navigator.push(
@@ -547,13 +552,13 @@ class _MyhomeState extends State<Myhome> {
                           );
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.sort_by_alpha_sharp),
+                    child: const Icon(Icons.sort_by_alpha_sharp),
                     label: "Merge Sort",
                     onTap: () => setState(() {
                           onMergeSortButtonPressed(context);
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.sort_rounded),
+                    child: const Icon(Icons.sort_rounded),
                     label: "Shell Sort",
                     onTap: () => setState(() {
                           Navigator.push(
@@ -564,57 +569,77 @@ class _MyhomeState extends State<Myhome> {
                           );
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.help),
+                    child: const Icon(Icons.help),
                     label: "Help",
                     onTap: () => setState(() {
-                          modo = 5;
-                          eliminarBoceto();
+                          showDialog(
+                              context: context,
+                              //El mensaje no se puede saltear
+                              barrierDismissible: false,
+                              builder: (context) {
+                                return AlertDialog(
+                                  //titulo del mensaje
+                                  title: const Text("AYUDA"),
+                                  content: const Text(
+                                      "La aplicación permite la graficación de grafos y obtener su matriz de adyacencia\nEl boton inferior derecho desplliega la lista de herramientas de la aplicación\n Para utilizar las herramientas se deben seleccionar de la lista\nBorrar todo: Elimina todos los nodos y conexiones actuales en el proyecto.\nEditar nodo: Permite tocar un nodo para editar su nombre/valor.\nMover nodo: Permite arrastrar los nodos en pantalla para una nueva posición.\nEliminar: Permite tocar un nodo para eliminarlo, incluyendo sus conexiones.\nCrear relación: Permite deslizar una conexión de un nodo a otro para luego darle un valor.\nCrear nodo: Permite colocar con un toque nuevos nodos en pantalla.\nFinalmente, el boton inferior izquierdo desplliega la matriz de adyacencia en base a los grafos en pantalla."),
+                                  actions: [
+                                    //Botón del mensaje de cancelar eliminación
+                                    TextButton(
+                                        onPressed: () {
+                                          //sale del mensaje
+                                          Navigator.of(context).pop();
+                                        },
+                                        //Mensaje del botón
+                                        child: const Text("Aceptar")),
+                                  ],
+                                );
+                              });
                         })),
               ],
             ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 10.0)),
+            const Padding(padding: EdgeInsets.symmetric(horizontal: 10.0)),
             SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
               mini: true,
               childrenButtonSize: const Size(50.0, 50.0),
               children: [
                 SpeedDialChild(
-                    child: Icon(Icons.add),
+                    child: const Icon(Icons.add),
                     label: "Crear Nodo",
                     onTap: () => setState(() {
                           modo = 1;
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.timeline),
+                    child: const Icon(Icons.timeline),
                     label: "Crear relacion",
                     onTap: () => setState(() {
                           modo = 2;
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.delete),
+                    child: const Icon(Icons.delete),
                     label: "Eliminar",
                     onTap: () => setState(() {
                           modo = 3;
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.pan_tool),
+                    child: const Icon(Icons.pan_tool),
                     label: "Mover Nodo",
                     onTap: () => setState(() {
                           modo = 4;
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.edit),
+                    child: const Icon(Icons.edit),
                     label: "Editar Nodo",
                     onTap: () => setState(() {
                           modo = 5;
                           eliminarBoceto();
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.save),
+                    child: const Icon(Icons.save),
                     label: "Sobresescribir",
                     onTap: () => setState(() {
                           modo = 6;
@@ -628,7 +653,7 @@ class _MyhomeState extends State<Myhome> {
                           });
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.save),
+                    child: const Icon(Icons.save),
                     label: "Guardar como",
                     onTap: () => setState(() {
                           modo = 7;
@@ -642,7 +667,7 @@ class _MyhomeState extends State<Myhome> {
                           });
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.drive_folder_upload),
+                    child: const Icon(Icons.drive_folder_upload),
                     label: "Cargar",
                     onTap: () => setState(() {
                           modo = 8;
@@ -652,7 +677,7 @@ class _MyhomeState extends State<Myhome> {
                           });
                         })),
                 SpeedDialChild(
-                    child: Icon(Icons.clear),
+                    child: const Icon(Icons.clear),
                     label: "Borrar Todo",
                     onTap: () => setState(() {
                           modo = -1;
@@ -790,9 +815,9 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //Titulo del mensaje
-            title: Text("CONFIRMAR ELIMINACIÓN"),
+            title: const Text("CONFIRMAR ELIMINACIÓN"),
             //Cuerpo del mensaje
-            content: Text("Se eliminará el nodo y sus conexiones."),
+            content: const Text("Se eliminará el nodo y sus conexiones."),
             actions: [
               //Botón del mensaje para confirmar la eliminación
               TextButton(
@@ -805,7 +830,7 @@ class _MyhomeState extends State<Myhome> {
                     //sale del mensaje
                     Navigator.of(context).pop();
                   }, //Mensaje del botón
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //Botón del mensaje de cancelar eliminación
               TextButton(
                   onPressed: () {
@@ -813,7 +838,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                   },
                   //Mensaje del botón
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -856,7 +881,7 @@ class _MyhomeState extends State<Myhome> {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
-              title: Text("Ingrese oferta " + con.toString()),
+              title: Text("Ingrese oferta $con"),
               content: Form(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -879,14 +904,14 @@ class _MyhomeState extends State<Myhome> {
                           context, con + 1, matrizAdyacencia, of, dem);
                     }
                   },
-                  child: Text("OK"),
+                  child: const Text("OK"),
                 ),
                 TextButton(
                   onPressed: () {
                     continueDialogs = false;
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                 ),
               ],
             );
@@ -913,7 +938,7 @@ class _MyhomeState extends State<Myhome> {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
             return AlertDialog(
-              title: Text("Ingrese demanda " + con.toString()),
+              title: Text("Ingrese demanda $con"),
               content: Form(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -944,14 +969,14 @@ class _MyhomeState extends State<Myhome> {
                       ));
                     }
                   },
-                  child: Text("OK"),
+                  child: const Text("OK"),
                 ),
                 TextButton(
                   onPressed: () {
                     continueDialogs = false;
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel"),
+                  child: const Text("Cancel"),
                 ),
               ],
             );
@@ -973,7 +998,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (BuildContext context) {
           TextEditingController textFieldController = TextEditingController();
           return AlertDialog(
-            title: Text("Ingrese oferta " + (con + 1).toString()),
+            title: Text("Ingrese oferta ${con + 1}"),
             content: Form(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -992,96 +1017,19 @@ class _MyhomeState extends State<Myhome> {
                   textFieldController.clear();
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("Cancel"),
+                child: const Text("Cancel"),
               ),
             ],
           );
         },
       );
     }
-  }
-
-  _pruebashowDijkstraDialog(BuildContext context) {
-    TextEditingController text1Controller = TextEditingController();
-    TextEditingController text2Controller = TextEditingController();
-    int selectedOption = 1;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Ingrese rango'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: text1Controller,
-                decoration: const InputDecoration(
-                  labelText: 'Inicio',
-                ),
-              ),
-              TextField(
-                controller: text2Controller,
-                decoration: const InputDecoration(
-                  labelText: 'Final',
-                ),
-              ),
-              //SizedBox(height: 16),
-              RadioListTile(
-                title: const Text('Maximizar'),
-                value: 1,
-                groupValue: selectedOption,
-                onChanged: (value) {
-                  setState(() {
-                    selectedOption = value!;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: const Text('Minimizar'),
-                value: 2,
-                groupValue: selectedOption,
-                onChanged: (value) {
-                  setState(() {
-                    selectedOption = value!;
-                  });
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                String text1 = text1Controller.text;
-                String text2 = text2Controller.text;
-                creaJon();
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-            TextButton(
-              onPressed: () {
-                clearLineas();
-                Navigator.of(context).pop();
-              },
-              child: Text('Cls'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> _showDialogsOf(
@@ -1096,7 +1044,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (BuildContext context) {
           TextEditingController textFieldController = TextEditingController();
           return AlertDialog(
-            title: Text("Ingrese demanda " + (con + 1).toString()),
+            title: Text("Ingrese demanda ${con + 1}"),
             content: Form(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1115,13 +1063,13 @@ class _MyhomeState extends State<Myhome> {
                   textFieldController.clear();
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("Cancel"),
+                child: const Text("Cancel"),
               ),
             ],
           );
@@ -1134,6 +1082,67 @@ class _MyhomeState extends State<Myhome> {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => matnor(res[1], matrizAdyacencia, res[0]),
     ));
+  }
+
+  _showKruskalDialog(context) {
+    int selectedOption = 1;
+
+    showDialog(
+        context: context,
+        //No puede ser salteado
+        //barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setStatem) {
+            return AlertDialog(
+              //Titulo del mensaje
+              title: const Text("Seleccione accion"),
+
+              //TextField para recibir un valor
+              content: Form(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile(
+                    title: const Text('Maximizar'),
+                    value: 1,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile(
+                    title: const Text('Minimizar'),
+                    value: 2,
+                    groupValue: selectedOption,
+                    onChanged: (value) {
+                      setStatem(() {
+                        selectedOption = value!;
+                      });
+                    },
+                  ),
+                ],
+              )),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    creaKruskal(selectedOption);
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancelar'),
+                ),
+              ],
+            );
+          });
+        });
   }
 
   _showDijkstraDialog(context) {
@@ -1203,22 +1212,13 @@ class _MyhomeState extends State<Myhome> {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    clearLineas();
-                    //pruebalins();
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cls'),
+                  child: const Text('OK'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Cancelar'),
+                  child: const Text('Cancelar'),
                 ),
               ],
             );
@@ -1255,7 +1255,7 @@ class _MyhomeState extends State<Myhome> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("No Dirigido"),
+                      const Text("No Dirigido"),
                       Checkbox(
                           value: isChecked,
                           onChanged: (checked) {
@@ -1296,7 +1296,7 @@ class _MyhomeState extends State<Myhome> {
                       Navigator.of(context).pop();
                     },
                     //texto del boton
-                    child: Text("OK")),
+                    child: const Text("OK")),
                 //cancela la unión de nodos
                 TextButton(
                     onPressed: () {
@@ -1307,7 +1307,7 @@ class _MyhomeState extends State<Myhome> {
                       Navigator.of(context).pop();
                     },
                     //texto del boton
-                    child: Text("Cancel")),
+                    child: const Text("Cancel")),
               ],
             );
           });
@@ -1396,7 +1396,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //titulo del mensaje
-            title: Text("CAMBIE EL VALOR"),
+            title: const Text("CAMBIE EL VALOR"),
             content: TextField(
               //teclado solo con numeros
               keyboardType: TextInputType.number,
@@ -1426,7 +1426,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                     receptorMensaje.clear();
                   },
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela el cambio
               TextButton(
                   onPressed: () {
@@ -1434,7 +1434,7 @@ class _MyhomeState extends State<Myhome> {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1448,7 +1448,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //titulo del mensaje
-            title: Text("INGRESE EL NOMBRE"),
+            title: const Text("INGRESE EL NOMBRE"),
             content: TextField(
               //teclado solo con numeros
               keyboardType: TextInputType.text,
@@ -1466,7 +1466,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                     receptorMensaje.clear();
                   },
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela el cambio
               TextButton(
                   onPressed: () {
@@ -1474,7 +1474,7 @@ class _MyhomeState extends State<Myhome> {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1488,21 +1488,21 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //titulo del mensaje
-            title: Text("GUARDADO DE GRAFO"),
+            title: const Text("GUARDADO DE GRAFO"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   //valor numerico almacenado en receptorMensaje
                   controller: tituloGuardado,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Introduzca un Nombre',
                   ),
                 ),
                 TextField(
                   controller: descripcionGuardada,
-                  decoration:
-                      InputDecoration(hintText: 'Introduzca una descripción'),
+                  decoration: const InputDecoration(
+                      hintText: 'Introduzca una descripción'),
                 ),
                 Text('Cantidad de Nodos: ${cantN}'),
                 Text('Cantidad de Conexiones: ${cantL}')
@@ -1531,14 +1531,14 @@ class _MyhomeState extends State<Myhome> {
                     });
                     Navigator.of(context).pop();
                   },
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela el cambio
               TextButton(
                   onPressed: () {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1551,12 +1551,12 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //titulo del mensaje
-            title: Text("CARGADO DE GRAFO"),
+            title: const Text("CARGADO DE GRAFO"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Seleccione la configuración:'),
+                const Text('Seleccione la configuración:'),
                 Container(
                   color: Colors.blue,
                   height: 300,
@@ -1564,7 +1564,7 @@ class _MyhomeState extends State<Myhome> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: modeloGuardado.length,
                       itemBuilder: (context, index) {
@@ -1575,23 +1575,23 @@ class _MyhomeState extends State<Myhome> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(),
+                                const VerticalDivider(),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
                                       child: Text(
                                         '${modeloGuardado[index].Nombre}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      scrollDirection: Axis.horizontal,
                                     ),
                                     Text(
                                         'Lineas: ${modeloGuardado[index].cantidadLineas}'),
                                     Text(
                                         'Nodos: ${modeloGuardado[index].cantidadNodos}'),
-                                    Text('Descripción:'),
+                                    const Text('Descripción:'),
                                     Container(
                                       height: 56,
                                       width: 150,
@@ -1632,14 +1632,14 @@ class _MyhomeState extends State<Myhome> {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela el cambio
               TextButton(
                   onPressed: () {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1660,7 +1660,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //Titulo del mensaje
-            title: Text("SEGURO QUE QUIERE ELIMINAR EL GRAFO?"),
+            title: const Text("SEGURO QUE QUIERE ELIMINAR EL GRAFO?"),
             actions: [
               //Confirma la unión de nodos
               TextButton(
@@ -1672,7 +1672,7 @@ class _MyhomeState extends State<Myhome> {
                     });
                   },
                   //texto del boton
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela la unión de nodos
               TextButton(
                   onPressed: () {
@@ -1680,7 +1680,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                   },
                   //texto del boton
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1694,7 +1694,7 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //Titulo del mensaje
-            title: Text("SEGURO QUE QUIERE CARGAR EL GRAFO?"),
+            title: const Text("SEGURO QUE QUIERE CARGAR EL GRAFO?"),
             actions: [
               //Confirma la unión de nodos
               TextButton(
@@ -1705,7 +1705,7 @@ class _MyhomeState extends State<Myhome> {
                     });
                   },
                   //texto del boton
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela la unión de nodos
               TextButton(
                   onPressed: () {
@@ -1713,7 +1713,7 @@ class _MyhomeState extends State<Myhome> {
                     Navigator.of(context).pop();
                   },
                   //texto del boton
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1726,12 +1726,12 @@ class _MyhomeState extends State<Myhome> {
         builder: (context) {
           return AlertDialog(
             //titulo del mensaje
-            title: Text("GRAFO A SOBRESCRIBIR"),
+            title: const Text("GRAFO A SOBRESCRIBIR"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Seleccione:'),
+                const Text('Seleccione:'),
                 Container(
                   color: Colors.blue,
                   height: 300,
@@ -1739,7 +1739,7 @@ class _MyhomeState extends State<Myhome> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: modeloGuardado.length,
                       itemBuilder: (context, index) {
@@ -1750,23 +1750,23 @@ class _MyhomeState extends State<Myhome> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text('${modeloGuardado[index].id}'),
-                                VerticalDivider(),
+                                const VerticalDivider(),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
                                       child: Text(
                                         '${modeloGuardado[index].Nombre}',
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      scrollDirection: Axis.horizontal,
                                     ),
                                     Text(
                                         'Lineas: ${modeloGuardado[index].cantidadLineas}'),
                                     Text(
                                         'Nodos: ${modeloGuardado[index].cantidadNodos}'),
-                                    Text('Descripción:'),
+                                    const Text('Descripción:'),
                                     Container(
                                       height: 56,
                                       width: 150,
@@ -1812,14 +1812,14 @@ class _MyhomeState extends State<Myhome> {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("OK")),
+                  child: const Text("OK")),
               //cancela el cambio
               TextButton(
                   onPressed: () {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel")),
+                  child: const Text("Cancel")),
             ],
           );
         });
@@ -1829,17 +1829,8 @@ class _MyhomeState extends State<Myhome> {
     String cifrado = "";
     vNodo.forEach((Nodo) {
       cantN++;
-      cifrado = cifrado +
-          Nodo.x.toStringAsPrecision(7) +
-          "," +
-          Nodo.y.toStringAsPrecision(7) +
-          "," +
-          Nodo.radio.toString() +
-          "," +
-          Nodo.codigo +
-          "," +
-          Nodo.st.toString() +
-          ";";
+      cifrado =
+          "${"$cifrado${Nodo.x.toStringAsPrecision(7)}," + Nodo.y.toStringAsPrecision(7)},${Nodo.radio},${Nodo.codigo},${Nodo.st};";
     });
     return cifrado;
   }
@@ -1848,15 +1839,8 @@ class _MyhomeState extends State<Myhome> {
     String cifrado = "";
     vLineas.forEach((Linea) {
       cantL++;
-      cifrado = cifrado +
-          Linea.Ni.codigo +
-          "," +
-          Linea.Nf.codigo +
-          "," +
-          Linea.valor +
-          "," +
-          Linea.tipo.toString() +
-          ";";
+      cifrado =
+          "$cifrado${Linea.Ni.codigo},${Linea.Nf.codigo},${Linea.valor},${Linea.tipo};";
     });
     return cifrado;
   }
@@ -1871,7 +1855,6 @@ class _MyhomeState extends State<Myhome> {
     }
     vLineas.clear();
     List<String> ListaLineas = cifrado.Lineas.split(";");
-    print(ListaLineas);
     for (int i = 0; i < cifrado.cantidadLineas; i++) {
       ModeloNodo Nii = vNodo[0];
       ModeloNodo Nff = vNodo[0];
@@ -1895,86 +1878,47 @@ class _MyhomeState extends State<Myhome> {
 //    );
 //  }
   creaJon() {
+    sumaAlgor = "";
+    clearLineas();
     List<List<String>> matrizAdyacencia = [];
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Johnson jon = Johnson();
     int i = 1;
     var jonson = jon.calcJon(matrizAdyacencia);
-    var aux = jonson[0];
+    sumaAlgor = "Suma: ${jonson[1]}";
+    List<String> aux = jonson[0];
 
     List<int> vals = jon.mays(matrizAdyacencia);
 
     List<int> valsn = jon.mins(matrizAdyacencia, jonson[1]);
 
-    llenalis(aux);
     var holgs = jon.sacaHolg(matrizAdyacencia, aux, jonson[1], vals, valsn);
 
-    if (comparaLis(aux, estj) == true) {
-      estadoj = !estadoj;
-    } else {
-      estadoj = true;
-    }
-
-    if (estadoj == true) {
-      for (int i = 0; i < holgs.length; i++) {
-        for (int j = 0; j < holgs.length; j++) {
-          vLineas.forEach((linea) {
-            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
-                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
-              linea.holg = "h: " + holgs[i][j];
-            }
-          });
-        }
-      }
-
-      while (i < aux.length) {
+    for (int i = 0; i < holgs.length; i++) {
+      for (int j = 0; j < holgs.length; j++) {
         vLineas.forEach((linea) {
-          if (linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) {
-            linea.tipo = 5;
-            i++;
+          if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
+              linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
+            linea.holg = "h: " + holgs[i][j];
           }
         });
       }
-    } else {
-      for (int i = 0; i < holgs.length; i++) {
-        for (int j = 0; j < holgs.length; j++) {
-          vLineas.forEach((linea) {
-            if (linea.Ni.nombre == matrizAdyacencia[i + 1][0] &&
-                linea.Nf.nombre == matrizAdyacencia[0][j + 1]) {
-              linea.holg = "";
-            }
-          });
-        }
-      }
-      vLineas.forEach((linea) {
-        linea.tipo = 1;
-      });
     }
-  }
 
-  llenalis(List<String> l) {
-    estj.clear();
-    for (int i = 0; i < l.length; i++) {
-      estj.add(l[i]);
-    }
-  }
-
-  bool comparaLis(List<String> l1, List<String> l2) {
-    int t1 = l1.length;
-    int t2 = l2.length;
-    int s = 0;
-    if (t1 == t2) {
-      for (int i = 0; i < t1; i++) {
-        //if (identical(l1[i], l2[i])) {
-        if (l1[i] == l2[i]) {
-          s++;
+    for (int i = 1; i < aux.length; i++) {
+      for (int j = 0; j < vLineas.length; j++) {
+        var linea = vLineas[j];
+        if ((linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) ||
+            (linea.Nf.nombre == aux[i - 1] && linea.Ni.nombre == aux[i])) {
+          if (linea.tipo == 1) {
+            linea.tipo = 5;
+          } else if (linea.tipo == 0) {
+            linea.tipo = 6;
+          }
+          break; // Salir del bucle interno si se encuentra la línea correspondiente
         }
       }
     }
-    if (s == t1) {
-      return true;
-    }
-    return false;
   }
 
 /*
@@ -2007,56 +1951,19 @@ class _MyhomeState extends State<Myhome> {
   }
 
   creaDijkstra(int mxmn, String txt1, String txt2) {
+    sumaAlgor = "";
     clearLineas();
     List<List<String>> matrizAdyacencia = [];
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Dijkstra dij = Dijkstra();
-    int i = 1;
-
     List<dynamic> dijkstra =
         dij.dijkstraMax(matrizAdyacencia, inicio: txt1, fin: txt2);
 
     if (mxmn != 1) {
       dijkstra = dij.dijkstraMin(matrizAdyacencia, inicio: txt1, fin: txt2);
     }
-
-    //else {
-    //  dijkstra = dij.dijkstraMin(matrizAdyacencia);
-    //}
-
     List<String> aux = dijkstra[0];
-    print(aux);
-    print(dijkstra[1]);
-
-    //print(aux);
-
-    //clearLineas();
-    //while (i < aux.length) {
-    //  if (vLineas[j - 1].Ni.nombre == aux[i - 1] &&
-    //      vLineas[j - 1].Nf.nombre == aux[i]) {
-    //    vLineas[j - 1].tipo = 6;
-    //    i++;
-    //  }
-    //  j = (j % vLineas.length) + 1;
-//
-    //  print(j);
-    //}
-
-    //while (i < aux.length) {
-    //vLineas.forEach((linea) {
-    //  if ((linea.Ni.nombre == aux[i - 1] && linea.Nf.nombre == aux[i]) ||
-    //      (linea.Nf.nombre == aux[i - 1] && linea.Ni.nombre == aux[i])) {
-    //    //linea.tipo = 6;
-    //    if (linea.tipo == 1) {
-    //      linea.tipo = 5;
-    //    } else if (linea.tipo == 0) {
-    //      linea.tipo = 6;
-    //    }
-    //    if (i < aux.length - 1) {
-    //      i++;
-    //    }
-    //  }
-    //});
+    sumaAlgor = "Suma: ${dijkstra[1]}";
     for (int i = 1; i < aux.length; i++) {
       for (int j = 0; j < vLineas.length; j++) {
         var linea = vLineas[j];
@@ -2071,23 +1978,53 @@ class _MyhomeState extends State<Myhome> {
         }
       }
     }
+  }
 
-    //}
+  creaKruskal(int mxmn) {
+    sumaAlgor = "";
+    clearLineas();
+    int sum = 0;
+    List<List<String>> matrizAdyacencia = [];
+    matrizAdyacencia = generaMatriz(matrizAdyacencia);
+    List<CaminoKrus> puentes = matrizToLista(matrizAdyacencia);
+    List<String> vertices = matrizAdyacencia[0].sublist(1);
+    Kruskal grafo = Kruskal(vertices, puentes);
+    List<CaminoKrus> kruskal = grafo.kruskalMax();
+    if (mxmn != 1) {
+      kruskal = grafo.kruskalMin();
+    }
+    List<List<String>> aux = [];
+    for (var puente in kruskal) {
+      aux.add([puente.inicio, puente.destino]);
+      sum += puente.peso;
+    }
+    sumaAlgor = "Suma: $sum";
+
+    for (int i = 0; i < aux.length; i++) {
+      for (int j = 0; j < vLineas.length; j++) {
+        var linea = vLineas[j];
+        if ((linea.Ni.nombre == aux[i][0] && linea.Nf.nombre == aux[i][1]) ||
+            (linea.Nf.nombre == aux[i][0] && linea.Ni.nombre == aux[i][1])) {
+          if (linea.tipo == 1) {
+            linea.tipo = 5;
+          } else if (linea.tipo == 0) {
+            linea.tipo = 6;
+          }
+          break; // Salir del bucle interno si se encuentra la línea correspondiente
+        }
+      }
+    }
   }
 
   clearLineas() {
+    sumaAlgor = "";
     vLineas.forEach((linea) {
+      linea.holg = "";
       if (linea.tipo == 5) {
         linea.tipo = 1;
       } else if (linea.tipo == 6) {
         linea.tipo = 0;
       }
-    });
-  }
-
-  pruebalins() {
-    vLineas.forEach((linea) {
-      linea.tipo = 6;
     });
   }
 }

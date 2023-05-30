@@ -21,7 +21,6 @@ class Johnson {
     for (int i = 1; i < n; i++) {
       vuelta(i, 0, []);
     }
-
     return [rutaMasLarga, sm];
   }
 
@@ -53,7 +52,7 @@ class Johnson {
         sum.add(k);
       }
     }
-    print(sum);
+
     return sum;
   }
 
@@ -92,7 +91,7 @@ class Johnson {
     }
 
     sum = sum.reversed.toList();
-    print(sum);
+
     return sum;
   }
 
@@ -117,10 +116,7 @@ class Johnson {
     }
 
     vuelta(fin, may);
-    print(mat[0]);
-    for (int i = 0; i < nmat.length; i++) {
-      print(mat[i + 1][0].toString() + " " + nmat[i].toString());
-    }
+
     return nmat;
   }
 
