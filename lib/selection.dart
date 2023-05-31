@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-
 class SelectionSortScreen extends StatefulWidget {
   @override
   _SelectionSortScreenState createState() => _SelectionSortScreenState();
@@ -8,14 +7,18 @@ class SelectionSortScreen extends StatefulWidget {
 
 class _SelectionSortScreenState extends State<SelectionSortScreen> {
   final _formKey = GlobalKey<FormState>();
-  int? _cantidad;
-  List<int>? _unsortedList;
+  List<int> _unsortedList = [];
   List<int>? _sortedList;
-  Duration? _elapsedTime;
-
+  Stopwatch _stopwatch = Stopwatch();
+  TextEditingController campo=TextEditingController();
   List<int> _generarArrayAleatorio(int cantidad) {
     Random rng = Random();
     return List<int>.generate(cantidad, (i) => rng.nextInt(100));
+  }
+  @override
+  void dispose() {
+    _stopwatch.stop();
+    super.dispose();
   }
 
   @override
@@ -32,34 +35,53 @@ class _SelectionSortScreenState extends State<SelectionSortScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextFormField(
-                      decoration: InputDecoration(labelText: 'Cantidad de elementos'),
+                      decoration: InputDecoration(labelText: 'Ingrese un número'),
                       keyboardType: TextInputType.number,
+                      controller: campo,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, ingrese un número';
                         }
                         final n = int.tryParse(value);
-                        if (n == null || n <= 0) {
+                        if (n == null) {
                           return 'Por favor, ingrese un número válido';
                         }
                         return null;
                       },
-                      onSaved: (value) => _cantidad = int.parse(value!),
+                      onSaved: (value) {
+                        _unsortedList.add(int.parse(value!));
+                        campo.clear();
+                      },
                     ),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           setState(() {
-                            _unsortedList = _generarArrayAleatorio(_cantidad!);
-                            Stopwatch stopwatch = Stopwatch()..start();
-                            _sortedList = selectionSort(List<int>.from(_unsortedList!)); // crear una copia del array para evitar modificar el original
-                            stopwatch.stop();
-                            _elapsedTime = stopwatch.elapsed;
+                            // Agregado manualmente a la lista, no se genera automáticamente
                           });
                         }
                       },
-                      child: Text('Generar y ordenar array'),
+                      child: Text('Agregar a la lista'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_unsortedList.isNotEmpty) {
+                          setState(() {
+                            _startSorting();
+                          });
+                        }
+                      },
+                      child: Text('Ordenar lista'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                          setState(() {
+                            _unsortedList = _generarArrayAleatorio(int.parse(campo.text));
+                            _startSorting();
+                          });
+                      },
+                      child: Text('Generar lista aleatorea'),
                     ),
                   ],
                 ),
@@ -67,73 +89,44 @@ class _SelectionSortScreenState extends State<SelectionSortScreen> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Array antes de ordenar:'),
-                  Text(_unsortedList!.toString()),
+                  Text('Lista antes de ordenar:'),
+                  Text(_unsortedList.toString()),
                   SizedBox(height: 20),
-                  Text('Array después de ordenar:'),
+                  Text('Lista después de ordenar:'),
                   Text(_sortedList!.toString()),
                   SizedBox(height: 20),
                   Text('Tiempo transcurrido:'),
-                  Text('${(_elapsedTime!.inMicroseconds / 1000000).toStringAsFixed(4)} segundos'),
+                  Text('${(_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(4)} segundos'),
                 ],
               ),
       ),
     );
   }
 
-  List<int> selectionSort(List<int> list) {
-    list = List<int>.from(list); // crear una copia del array para evitar modificar el original
-    for (int i = 0; i < list.length - 1; i++) {
+  void _startSorting() {
+    _sortedList = null;
+    _stopwatch.reset();
+    _stopwatch.start();
+    _selectionSort();
+  }
+
+  void _selectionSort() async {
+    _sortedList = List<int>.from(_unsortedList);
+    for (int i = 0; i < _sortedList!.length - 1; i++) {
       int minIndex = i;
-      for (int j = i + 1; j < list.length; j++) {
-        if (list[j] < list[minIndex]) {
+      for (int j = i + 1; j < _sortedList!.length; j++) {
+        if (_sortedList![j] < _sortedList![minIndex]) {
           minIndex = j;
         }
       }
-      int temp = list[i];
-      list[i] = list[minIndex];
-      list[minIndex] = temp;
-    }
-    return list;
-  }
-}
-
-
-
-
-/*
-class Selection {
-  selection(List<List<String>> matrix) {
-    List<int> result = [];
-
-    for (int i = 1; i < matrix.length; i++) {
-      for (int j = 1; j < matrix.length; j++) {
-        result.add(int.parse(matrix[i][j]));
-      }
-    }
-
-    selectionSort(result);
-
-    return result;
-  }
-
-  void selectionSort(List<int> arr) {
-    int n = arr.length;
-
-    for (int i = 0; i < n - 1; i++) {
-      int minIndex = i;
-      for (int j = i + 1; j < n; j++) {
-        if (arr[j] < arr[minIndex]) {
-          minIndex = j;
-        }
-      }
-
       if (minIndex != i) {
-        int temp = arr[i];
-        arr[i] = arr[minIndex];
-        arr[minIndex] = temp;
+        int temp = _sortedList![i];
+        _sortedList![i] = _sortedList![minIndex];
+        _sortedList![minIndex] = temp;
       }
+      await Future.delayed(Duration(milliseconds: 100));
+      setState(() {});
     }
+    _stopwatch.stop();
   }
 }
-*/

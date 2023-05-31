@@ -1,87 +1,99 @@
-class UnionFind {
-  late List<int> parent;
-  late List<int> rank;
+import 'dart:collection';
 
-  UnionFind(int size) {
-    parent = List<int>.generate(size, (index) => index);
-    rank = List<int>.filled(size, 0);
-  }
+class CaminoKrus {
+  String inicio;
+  String destino;
+  int peso;
 
-  int find(int x) {
-    if (parent[x] != x) {
-      parent[x] = find(parent[x]);
-    }
-    return parent[x];
-  }
-
-  void union(int x, int y) {
-    int rootX = find(x);
-    int rootY = find(y);
-
-    if (rank[rootX] < rank[rootY]) {
-      parent[rootX] = rootY;
-    } else if (rank[rootX] > rank[rootY]) {
-      parent[rootY] = rootX;
-    } else {
-      parent[rootY] = rootX;
-      rank[rootX]++;
-    }
-  }
+  CaminoKrus(this.inicio, this.destino, this.peso);
 }
 
-class Edge {
-  int src, dest, weight;
+List<CaminoKrus> matrizToLista(List<List<String>> matrix) {
+  List<CaminoKrus> puentes = [];
+  int filas = matrix.length;
+  int cols = matrix[0].length;
 
-  Edge(this.src, this.dest, this.weight);
+  for (int i = 1; i < filas; i++) {
+    for (int j = i + 1; j < cols; j++) {
+      if (matrix[i][j] != "0") {
+        puentes.add(
+            CaminoKrus(matrix[i][0], matrix[0][j], int.parse(matrix[i][j])));
+      }
+    }
+  }
+  return puentes;
 }
 
-class Graph {
-  late int vertices;
-  late List<Edge> edges;
+class Kruskal {
+  List<String> vertices;
+  List<CaminoKrus> puentes;
 
-  Graph(int v) {
-    vertices = v;
-    edges = [];
-  }
+  Kruskal(this.vertices, this.puentes);
 
-  void addEdge(int src, int dest, int weight) {
-    edges.add(Edge(src, dest, weight));
-  }
-
-  List<Edge> kruskalMST() {
-    List<Edge> result = [];
-    edges.sort((a, b) => a.weight.compareTo(b.weight));
-    UnionFind uf = UnionFind(vertices);
-
-    int i = 0;
-    int e = 0;
-    while (e < vertices - 1) {
-      Edge nextEdge = edges[i++];
-      int x = uf.find(nextEdge.src);
-      int y = uf.find(nextEdge.dest);
+  List<CaminoKrus> kruskalMin() {
+    puentes.sort((a, b) => a.peso.compareTo(b.peso));
+    var padre = HashMap<String, String>();
+    var rango = HashMap<String, int>();
+    List<CaminoKrus> minimizacion = [];
+    for (var vert in vertices) {
+      padre[vert] = vert;
+      rango[vert] = 0;
+    }
+    for (var puente in puentes) {
+      String x = buscar(padre, puente.inicio);
+      String y = buscar(padre, puente.destino);
 
       if (x != y) {
-        result.add(nextEdge);
-        uf.union(x, y);
-        e++;
+        minimizacion.add(puente);
+        union(padre, rango, x, y);
+      }
+    }
+    return minimizacion;
+  }
+
+  List<CaminoKrus> kruskalMax() {
+    puentes.sort((a, b) =>
+        b.peso.compareTo(a.peso)); // Ordenar de forma descendente por peso
+    var padre = HashMap<String, String>();
+    var rango = HashMap<String, int>();
+    List<CaminoKrus> maximizacion = [];
+
+    for (var vert in vertices) {
+      padre[vert] = vert;
+      rango[vert] = 0;
+    }
+
+    for (var puente in puentes) {
+      String x = buscar(padre, puente.inicio);
+      String y = buscar(padre, puente.destino);
+
+      if (x != y) {
+        maximizacion.add(puente);
+        union(padre, rango, x, y);
       }
     }
 
-    return result;
+    return maximizacion;
   }
-}
 
-void main() {
-  Graph graph = Graph(4);
-  graph.addEdge(0, 1, 10);
-  graph.addEdge(0, 2, 6);
-  graph.addEdge(0, 3, 5);
-  graph.addEdge(1, 3, 15);
-  graph.addEdge(2, 3, 4);
+  String buscar(HashMap<String, String> padre, String vert) {
+    if (padre[vert] == vert) {
+      return vert;
+    }
+    return buscar(padre, padre[vert]!);
+  }
 
-  List<Edge> mst = graph.kruskalMST();
-  print("Edges in MST:");
-  for (Edge edge in mst) {
-    print("${edge.src} -- ${edge.dest}  Weight: ${edge.weight}");
+  void union(HashMap<String, String> padre, HashMap<String, int> rango,
+      String x, String y) {
+    String raizX = buscar(padre, x);
+    String raizY = buscar(padre, y);
+    if (rango[raizX]!.compareTo(rango[raizY]!) < 0) {
+      padre[raizX] = raizY;
+    } else if (rango[raizX]!.compareTo(rango[raizY]!) > 0) {
+      padre[raizY] = raizX;
+    } else {
+      padre[raizY] = raizX;
+      rango[raizX] = rango[raizX]! + 1;
+    }
   }
 }
