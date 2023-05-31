@@ -24,6 +24,8 @@ import 'compete.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/cupertino.dart';
 import 'kruskal.dart';
+import 'noroeste.dart';
+import 'matrizExtendida.dart';
 
 class Myhome extends StatefulWidget {
   const Myhome({Key? key}) : super(key: key);
@@ -35,6 +37,8 @@ class Myhome extends StatefulWidget {
 
 class _MyhomeState extends State<Myhome> {
   //Variable que recibe el valor de los mensajes
+  List<String> _demanda = [];
+  List<String> _disponibilidad = [];
   String sumaAlgor = "";
 
   TextEditingController receptorMensaje = TextEditingController();
@@ -458,16 +462,19 @@ class _MyhomeState extends State<Myhome> {
                 SpeedDialChild(
                   child: const Icon(Icons.north_west),
                   label: 'Norwest',
-                  onTap: () async {
-                    of = [];
-                    dem = [];
-
+                  onTap: () {
+                    //of = [];
+                    //dem = [];
+//
                     List<List<String>> matrizAdyacencia = [];
                     matrizAdyacencia = generaMatriz(matrizAdyacencia);
-                    continueDialogs = true;
+                    //continueDialogs = true;
+                    List<List<String>> matcostos = [];
+                    matcostos = matCostos(matrizAdyacencia);
+                    _mensajeObtenerDmdDisp(context, matcostos);
 
-                    await _showDialogsDem(context, matrizAdyacencia, of, dem);
-                    await _showDialogsOf(context, matrizAdyacencia, of, dem);
+                    //await _showDialogsDem(context, matrizAdyacencia, of, dem);
+                    //await _showDialogsOf(context, matrizAdyacencia, of, dem);
                   },
                 ),
                 SpeedDialChild(
@@ -1387,6 +1394,89 @@ class _MyhomeState extends State<Myhome> {
     return result;
   }
 
+  List<List<String>> getMatrizReducida(List<List<String>> matrizInicial) {
+    matrizInicial = _deleteZeros(matrizInicial);
+    matrizInicial = _transpose(matrizInicial);
+    matrizInicial = _deleteZeros(matrizInicial);
+    matrizInicial = _transpose(matrizInicial);
+    return matrizInicial;
+  }
+
+  List<List<int>> getMatrizCostos(List<List<String>> matrizInicial) {
+    matrizInicial.removeAt(0);
+    matrizInicial = _transpose(matrizInicial);
+    matrizInicial.removeAt(0);
+    matrizInicial = _transpose(matrizInicial);
+    return _parse(matrizInicial);
+  }
+
+  List<List<String>> equilibrarDisponibilidad(
+      List<List<String>> matrizInicial) {
+    matrizInicial = _transpose(matrizInicial);
+    List<String> newList = List.generate(matrizInicial[0].length, (_) => '0');
+    newList[0] = 'E';
+    matrizInicial.add(newList);
+    matrizInicial = _transpose(matrizInicial);
+    return matrizInicial;
+  }
+
+  List<List<String>> equilibrarDemanda(List<List<String>> matrizInicial) {
+    List<String> newList = List.generate(matrizInicial[0].length, (_) => '0');
+    newList[0] = 'E';
+    matrizInicial.add(newList);
+    return matrizInicial;
+  }
+
+  List<List<int>> _parse(List<List<String>> matrizInicial) {
+    List<List<int>> result = List.generate(matrizInicial.length,
+        (_) => List.generate(matrizInicial[0].length, (_) => 0));
+    for (int f = 0; f < matrizInicial.length; f++) {
+      for (int c = 0; c < matrizInicial[f].length; c++) {
+        result[f][c] = int.parse(matrizInicial[f][c]);
+      }
+    }
+    return result;
+  }
+
+  List<List<String>> _deleteZeros(List<List<String>> matrizInicial) {
+    List<List<String>> result = [];
+    List<int> posAEliminar = [];
+    result.add(matrizInicial[0]);
+    for (int f = 1; f < matrizInicial.length; f++) {
+      bool flag = false;
+      for (int c = 1; c < matrizInicial[f].length; c++) {
+        if (matrizInicial[f][c] != '0') {
+          flag = true;
+          break;
+        }
+      }
+      if (flag) {
+        result.add(matrizInicial[f]);
+      }
+    }
+    posAEliminar.forEach((valor) {
+      result.removeAt(valor);
+    });
+    return result;
+  }
+
+  List<List<String>> _transpose(List<List<String>> matrix) {
+    if (matrix.isEmpty) {
+      return <List<String>>[];
+    }
+    int numRows = matrix.length;
+    int numCols = matrix[0].length;
+    List<List<String>> transposed =
+        List.generate(numCols, (_) => List.generate(numRows, (_) => '0'));
+    for (int i = 0; i < numRows; i++) {
+      for (int j = 0; j < numCols; j++) {
+        transposed[j][i] = matrix[i][j];
+      }
+    }
+    //print('Matriz transpuesta: ${transposed}');
+    return transposed;
+  }
+
   //Mensaje para cambiar el valor de una conexión
   _showDialogCambio(context, ModeloNodo e, ModeloLinea h) {
     showDialog(
@@ -1478,6 +1568,142 @@ class _MyhomeState extends State<Myhome> {
             ],
           );
         });
+  }
+
+  List<List<String>> matCostos(List<List<String>> matr) {
+    List<List<String>> nmat = [];
+    nmat.add(matr[0]);
+    List<int> filasEliminar = [];
+    List<int> columnasEliminar = [];
+
+    for (int i = 1; i < matr.length; i++) {
+      if (!filaCero(matr[i])) {
+        nmat.add(matr[i]);
+      } else {
+        filasEliminar.add(i);
+      }
+
+      if (colCero(matr, i)) {
+        columnasEliminar.add(i);
+      }
+    }
+
+    for (int i = columnasEliminar.length - 1; i >= 0; i--) {
+      int col = columnasEliminar[i];
+      nmat[0].removeAt(col);
+      for (int j = 1; j < nmat.length; j++) {
+        nmat[j].removeAt(col);
+      }
+    }
+
+    return nmat;
+  }
+
+  bool filaCero(List<String> fila) {
+    for (int i = 1; i < fila.length; i++) {
+      if (fila[i] != "0") {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool colCero(List<List<String>> matr, int col) {
+    for (int i = 1; i < matr.length; i++) {
+      if (matr[i][col] != "0") {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  _mensajeObtenerDmdDisp(context, List<List<String>> matrix) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        _demanda.clear();
+        _disponibilidad.clear();
+        _disponibilidad = List.generate(matrix.length - 1, (_) => "");
+        _demanda = List.generate(matrix[0].length - 1, (_) => "");
+
+        return AlertDialog(
+          title: Text("Algoritmo de Asignación Extendido"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text('Matriz de Costos: '),
+                for (var i = 0; i < matrix.length + 1; i++)
+                  Row(
+                    children: [
+                      for (var j = 0; j < matrix[0].length + 1; j++)
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: (i >= matrix.length || j >= matrix[i].length)
+                                ? (i == 0 ||
+                                        j == 0 ||
+                                        (i == matrix.length &&
+                                            j == matrix[0].length))
+                                    ? Text('')
+                                    : TextFormField(
+                                        initialValue: '',
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (i == matrix.length) {
+                                              _demanda[j - 1] =
+                                                  value.toString();
+                                            } else if (j == matrix[0].length) {
+                                              _disponibilidad[i - 1] =
+                                                  value.toString();
+                                            }
+                                          });
+                                        },
+                                      )
+                                : Text(matrix[i][j]),
+                          ),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            //TextButton(
+            //  onPressed: () {
+            //    setState(() {
+            //      // Resto del código para minimizar
+            //      Norwest nor = Norwest();
+            //    });
+            //  },
+            //  child: Text("Minimizar"),
+            //),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  // Resto del código para maximizar
+                  Norwest nor = Norwest();
+                  var muestra = nor.calcNor(matrix, _disponibilidad, _demanda);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          matrizExtendida(muestra[1], muestra[0])));
+                });
+              },
+              child: Text("OK"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {});
+                Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _MensajeGuardado(context, String cifraNodo, String cifraLinea) {
@@ -1883,7 +2109,6 @@ class _MyhomeState extends State<Myhome> {
     List<List<String>> matrizAdyacencia = [];
     matrizAdyacencia = generaMatriz(matrizAdyacencia);
     Johnson jon = Johnson();
-    int i = 1;
     var jonson = jon.calcJon(matrizAdyacencia);
     sumaAlgor = "Suma: ${jonson[1]}";
     List<String> aux = jonson[0];
