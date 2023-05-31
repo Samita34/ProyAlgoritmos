@@ -312,7 +312,7 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                     String text1 = text1Controller.text;
                     text1 = text1.isEmpty ? "." : text1;
 
-                    listToTree(selectedOption, text1);
+                    //listToTree(selectedOption, text1);
                     setState(() {});
                     Navigator.of(context).pop();
                   },
@@ -356,7 +356,8 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
       return;
     }
 
-    listToTree(selectedOption, text3);
+    listToTree(selectedOption,numberOfElements,list2,list3);
+    
     setState(() {});
     Navigator.of(context).pop();
   },
@@ -368,20 +369,29 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
         });
   }
 
-  listToTree(int order, String list) {
+  listToTree(int order, int n, List<int> list1, List<int> list2) {
     List<int> arbolList = [];
-    List<String> stringList = list.split(",");
-    for (String str in stringList) {
-      arbolList.add(int.parse(str.trim()));
-    }
+
 
     if (order == 1) {
-      
+
+  List<List<String>> matrix = List.generate(list1.length, (_) => List.filled(list2.length, "0"));
+
+  for (int i = 0; i < list1.length; i++) {
+    for (int j = 0; j < list2.length; j++) {
+      if (list1[i] == list2[j]) {
+        matrix[i][j] = "*";
+      }
+    }
+  }
+  for (List<String> row in matrix) {
+    print(row);
+  }
     }
     if (order == 2) {
       
     }
-    if (order == 3) {}
+
   }
 }
 
