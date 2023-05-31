@@ -145,7 +145,7 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                     });
                   },
                   child: Text(
-                    "Ingresar una lista",
+                    "Ingrese las listas",
                     style: TextStyle(color: Colors.white, fontSize: 15),
                   ),
                 ),
@@ -250,7 +250,9 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
 
   _ingresoListaDialog(context) {
     TextEditingController text1Controller = TextEditingController();
-    //TextEditingController text2Controller = TextEditingController();
+    TextEditingController text2Controller = TextEditingController();
+    TextEditingController text3Controller = TextEditingController();
+
     int selectedOption = 1;
 
     showDialog(
@@ -258,7 +260,7 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setStatem) {
             return AlertDialog(
-              title: const Text("Ingrese la lista (Separada por comas)"),
+              title: const Text("Ingrese las listas (Separada por comas)"),
               content: Form(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -266,11 +268,23 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                   TextField(
                     controller: text1Controller,
                     decoration: const InputDecoration(
-                      labelText: 'Lista',
+                      labelText: 'Numero de Elementos',
+                    ),
+                  ),
+                  TextField(
+                    controller: text2Controller,
+                    decoration: const InputDecoration(
+                      labelText: 'InOrden',
+                    ),
+                  ),
+                  TextField(
+                    controller: text3Controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Lista a Elección',
                     ),
                   ),
                   RadioListTile(
-                    title: const Text('InOrder'),
+                    title: const Text('PreOrder'),
                     value: 1,
                     groupValue: selectedOption,
                     onChanged: (value) {
@@ -280,18 +294,8 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                     },
                   ),
                   RadioListTile(
-                    title: const Text('PreOrder'),
-                    value: 2,
-                    groupValue: selectedOption,
-                    onChanged: (value) {
-                      setStatem(() {
-                        selectedOption = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
                     title: const Text('PostOrder'),
-                    value: 3,
+                    value: 2,
                     groupValue: selectedOption,
                     onChanged: (value) {
                       setStatem(() {
@@ -343,32 +347,11 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
       
     }
     if (order == 2) {
-      constructBinaryTree(arbolList);
+      
     }
     if (order == 3) {}
   }
 }
 
-TreeNode? constructBinaryTree(List<int> preorder) {
-  if (preorder.isEmpty) {
-    return null;
-  }
 
-  TreeNode root = TreeNode(preorder[0]);
-  List<int> leftSubtree = [];
-  List<int> rightSubtree = [];
-
-  for (int i = 1; i < preorder.length; i++) {
-    if (preorder[i] < root.val) {
-      leftSubtree.add(preorder[i]);
-    } else {
-      rightSubtree.add(preorder[i]);
-    }
-  }
-
-  root.left = constructBinaryTree(leftSubtree);
-  root.right = constructBinaryTree(rightSubtree);
-
-  return root;
-}
 
