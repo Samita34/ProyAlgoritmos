@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'arbol.dart';
 import 'arbolPainter.dart';
@@ -324,12 +325,43 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                   },
                   child: Text('Cls'),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancelar'),
-                ),
+   TextButton(
+  onPressed: () {
+    String text1 = text1Controller.text;
+    String text2 = text2Controller.text;
+    String text3 = text3Controller.text;
+
+    text1 = text1.isEmpty ? "." : text1;
+
+    // Convertimos los campos de texto a listas de enteros
+    List<int> list2 = text2.split(',').map((str) => int.parse(str.trim())).toList();
+    List<int> list3 = text3.split(',').map((str) => int.parse(str.trim())).toList();
+
+    // Verificamos si las listas tienen el mismo número de elementos que el valor indicado en text1
+    int numberOfElements = int.parse(text1);
+    if (list2.length != numberOfElements || list3.length != numberOfElements) {
+      print("Las listas deben tener $numberOfElements elementos cada una.");
+      return;
+    }
+
+    // Verificamos si todos los elementos son únicos en las listas
+    if (list2.toSet().length != list2.length || list3.toSet().length != list3.length) {
+      print("Los números en las listas deben ser únicos y no deben repetirse.");
+      return;
+    }
+
+    // Comprobamos si todos los elementos de list3 están presentes en list2
+    if (!list2.toSet().containsAll(list3.toSet())) {
+      print("Todos los elementos en 'Lista a Elección' deben estar presentes en 'InOrden'.");
+      return;
+    }
+
+    listToTree(selectedOption, text1);
+    setState(() {});
+    Navigator.of(context).pop();
+  },
+  child: Text('OK'),
+),
               ],
             );
           });
