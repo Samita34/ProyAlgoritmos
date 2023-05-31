@@ -28,6 +28,45 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
     _textFieldController.dispose();
     super.dispose();
   }
+  //in order, p order
+  listToTree(int order, List<int> list1, List<int> list2) {
+    List<int> arbolList = [];
+    List<List<String>> matrix = List.generate(list1.length+1, (_) => List.filled(list2.length+1, "0"));
+    if (order == 1) {
+    for(int i=1,k=0;i<=list1.length;i++,k++){
+        int li1=list1[k];
+        int li2=list2[k];
+        matrix[0][i]="$li1";
+        matrix[i][0]="$li2";
+      }
+    }
+    if (order == 2) {
+      for(int i=1,k=list2.length-1;i<=list1.length;i++,k--){
+        int li1=list1[k];
+        int li2=list2[k];
+        matrix[0][i]="$li1";
+        matrix[i][0]="$li2";
+      }
+    }
+      for (int i = 1; i <= list1.length; i++) {
+        for (int j = 1; j <= list2.length; j++) {
+          if (matrix[0][i] == matrix[j][0]) {
+            matrix[i][j] = "*";
+          }
+        }
+      }/*
+      for (List<String> row in matrix) {
+        print(row);
+      }*/
+      objArbol.resetArbol();
+      for (int i = 1; i <= list1.length; i++) {
+        for (int j = 1; j <= list2.length; j++) {
+          if (matrix[i][j] == "*") {
+            objArbol.insertarNodo(int.parse(matrix[j][0]));
+          }
+        }
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,27 +139,6 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CupertinoButton(
-                            padding: EdgeInsets.all(5),
-                            color: Color(0xffff6464),
-                            onPressed: () {
-                              setState(() {
-                                // Eliminar
-                              });
-                            },
-                            child: Text(
-                              "Eliminar",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xfffff5a5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -160,9 +178,9 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                   children: [
                     SpeedDialChild(
                       child: Icon(Icons.linear_scale),
-                      label: 'PreOrder',
+                      label: 'InOrder',
                       onTap: () {
-                        _showDialogPre();
+                        _showDialogIn();
                       },
                     ),
                     SpeedDialChild(
@@ -174,9 +192,9 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
                     ),
                     SpeedDialChild(
                       child: Icon(Icons.linear_scale),
-                      label: 'InOrder',
+                      label: 'PreOrder',
                       onTap: () {
-                        _showDialogIn();
+                        _showDialogPre();
                       },
                     ),
                   ],
@@ -308,90 +326,54 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
               )),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    String text1 = text1Controller.text;
-                    text1 = text1.isEmpty ? "." : text1;
+                onPressed: () {
+                  String text1 = text1Controller.text;
+                  String text3 = text2Controller.text;
+                  String text2 = text3Controller.text;
 
-                    //listToTree(selectedOption, text1);
+                  text1 = text1.isEmpty ? "." : text1;
+
+                  // Convertimos los campos de texto a listas de enteros
+                  List<int> list2 = text2.split(',').map((str) => int.parse(str.trim())).toList();
+                  List<int> list3 = text3.split(',').map((str) => int.parse(str.trim())).toList();
+
+                  // Verificamos si las listas tienen el mismo número de elementos que el valor indicado en text1
+                  int numberOfElements = int.parse(text1);
+                  if (list2.length != numberOfElements || list3.length != numberOfElements) {
+                    print("Las listas deben tener $numberOfElements elementos cada una.");
+                    return;
+                  }
+
+                  // Verificamos si todos los elementos son únicos en las listas
+                  if (list2.toSet().length != list2.length || list3.toSet().length != list3.length) {
+                    print("Los números en las listas deben ser únicos y no deben repetirse.");
+                    return;
+                  }
+
+                  // Comprobamos si todos los elementos de list3 están presentes en list2
+                  if (!list2.toSet().containsAll(list3.toSet())) {
+                    print("Todos los elementos en 'Lista a Elección' deben estar presentes en 'InOrden'.");
+                    return;
+                  }
+
+                  listToTree(selectedOption,list2,list3);
+                  
+                  setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+TextButton(
+                  onPressed: () {
                     setState(() {});
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'),
+                  child: Text('Cancelar'),
                 ),
-                TextButton(
-                  onPressed: () {
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cls'),
-                ),
-   TextButton(
-  onPressed: () {
-    String text1 = text1Controller.text;
-    String text2 = text2Controller.text;
-    String text3 = text3Controller.text;
-
-    text1 = text1.isEmpty ? "." : text1;
-
-    // Convertimos los campos de texto a listas de enteros
-    List<int> list2 = text2.split(',').map((str) => int.parse(str.trim())).toList();
-    List<int> list3 = text3.split(',').map((str) => int.parse(str.trim())).toList();
-
-    // Verificamos si las listas tienen el mismo número de elementos que el valor indicado en text1
-    int numberOfElements = int.parse(text1);
-    if (list2.length != numberOfElements || list3.length != numberOfElements) {
-      print("Las listas deben tener $numberOfElements elementos cada una.");
-      return;
-    }
-
-    // Verificamos si todos los elementos son únicos en las listas
-    if (list2.toSet().length != list2.length || list3.toSet().length != list3.length) {
-      print("Los números en las listas deben ser únicos y no deben repetirse.");
-      return;
-    }
-
-    // Comprobamos si todos los elementos de list3 están presentes en list2
-    if (!list2.toSet().containsAll(list3.toSet())) {
-      print("Todos los elementos en 'Lista a Elección' deben estar presentes en 'InOrden'.");
-      return;
-    }
-
-    listToTree(selectedOption,numberOfElements,list2,list3);
-    
-    setState(() {});
-    Navigator.of(context).pop();
-  },
-  child: Text('OK'),
-),
               ],
             );
           });
         });
-  }
-
-  listToTree(int order, int n, List<int> list1, List<int> list2) {
-    List<int> arbolList = [];
-
-
-    if (order == 1) {
-
-  List<List<String>> matrix = List.generate(list1.length, (_) => List.filled(list2.length, "0"));
-
-  for (int i = 0; i < list1.length; i++) {
-    for (int j = 0; j < list2.length; j++) {
-      if (list1[i] == list2[j]) {
-        matrix[i][j] = "*";
-      }
-    }
-  }
-  for (List<String> row in matrix) {
-    print(row);
-  }
-    }
-    if (order == 2) {
-      
-    }
-
   }
 }
 
