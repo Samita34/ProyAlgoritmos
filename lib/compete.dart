@@ -99,7 +99,7 @@ class _CompeteScreenState extends State<CompeteScreen> {
                   Text(_sortedList!.toString()),
                   SizedBox(height: 20),
                   CustomPaint(
-                    size: Size(300, 300),
+                    size: Size(550, 550),
                     painter: CoordinatePainter(_unsortedList,_sortedList!),
                   ),
                 ],
@@ -136,9 +136,7 @@ class _CompeteScreenState extends State<CompeteScreen> {
 class CoordinatePainter extends CustomPainter {
   final List<double> unsortedCoordinates;
   final List<double> sortedCoordinates;
-
   CoordinatePainter(this.unsortedCoordinates, this.sortedCoordinates);
-
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -146,8 +144,8 @@ class CoordinatePainter extends CustomPainter {
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
+    final centerX = size.width / 4;
+    final centerY = size.height;
 
     // Dibujar unsortedCoordinates
     _drawPoints(canvas, unsortedCoordinates, centerX, centerY, paint);
@@ -168,8 +166,8 @@ class CoordinatePainter extends CustomPainter {
       final x = coordinates[i];
       final y = coordinates[i + 1];
       final pointX = centerX + x * 10;
-      final pointY = centerY + y * 10;
-      canvas.drawCircle(Offset(pointX, pointY), 5, paint);
+      final pointY = centerY - y * 10;
+      canvas.drawCircle(Offset(pointX, pointY), 6, paint);
     }
   }
 
