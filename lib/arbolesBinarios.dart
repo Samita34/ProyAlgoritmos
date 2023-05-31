@@ -356,7 +356,7 @@ class _ArbolesBinariosScreenState extends State<ArbolesBinariosScreen> {
       return;
     }
 
-    listToTree(selectedOption, text1);
+    listToTree(selectedOption, text3);
     setState(() {});
     Navigator.of(context).pop();
   },
